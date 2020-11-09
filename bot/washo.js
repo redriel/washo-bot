@@ -1,6 +1,6 @@
 const fs = require('fs');
 const Discord = require('discord.js');
-const { prefix, token } = require('./config.json');
+const { prefix, token, msgExpire } = require('./config.json');
 // const ytdl = require('ytdl-core');
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
@@ -31,7 +31,10 @@ client.on('message', async message => {
 	if (!command) return;
 
 	if (command.guildOnly && message.channel.type !== 'text') {
-		return message.reply('I can\'t execute that command inside DMs!');
+		return message
+			.reply('I can\'t execute that command inside DMs!')
+			.then(msg => { msg.delete({ timeout: msgExpire }) })
+			.catch(console.error);
 	}
 
 	if (command.args && !args.length) {
@@ -39,7 +42,10 @@ client.on('message', async message => {
 		if (command.usage) {
 			reply += `\nThe proper usage would be: \`${prefix}${command.name} ${command.usage}\``;
 		}
-		return message.channel.send(reply);
+		return message.channel
+			.send(reply)
+			.then(msg => { msg.delete({ timeout: msgExpire }) })
+			.catch(console.error);
 	}
 
 	if (!cooldowns.has(command.name)) {
@@ -55,7 +61,9 @@ client.on('message', async message => {
 
 		if (now < expirationTime) {
 			const timeLeft = (expirationTime - now) / 1000;
-			return message.reply(`please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`);
+			return message.reply(`please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`)
+				.then(msg => { msg.delete({ timeout: msgExpire }) })
+				.catch(console.error);
 		}
 	}
 
@@ -69,7 +77,9 @@ client.on('message', async message => {
 		});
 	} catch (error) {
 		console.error(error);
-		message.reply('There was an error trying to execute that command!');
+		message.reply(`There was an error trying to execute the command \`${commandName}\`!`)
+			.then(msg => { msg.delete({ timeout: msgExpire }) })
+			.catch(console.error);
 	}
 
 });
