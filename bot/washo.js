@@ -1,6 +1,8 @@
 const fs = require('fs');
 const Discord = require('discord.js');
-const { prefix, token, msgExpire } = require('./config.json');
+// Change in release the token path
+const { prefix, msgExpire } = require('./config.json');
+const { token } = require('./token.json');
 // const ytdl = require('ytdl-core');
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
