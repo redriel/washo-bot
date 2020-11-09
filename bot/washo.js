@@ -64,6 +64,9 @@ client.on('message', async message => {
 
 	try {
 		command.execute(message, args);
+		message.channel.bulkDelete(1, true).catch(err => {
+			console.error(err);
+		});
 	} catch (error) {
 		console.error(error);
 		message.reply('There was an error trying to execute that command!');

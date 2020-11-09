@@ -12,7 +12,7 @@ module.exports = {
             // console.log(userVolume);
             const dispatcher = connection.play(fs.createReadStream('resources/midnight.mp3'), { volume : 0.35 });
             dispatcher.on('start', () => {
-                console.log('audio.mp3 is now playing!');
+                return message.channel.send(`Now playing an old time classic.`);
             });
             dispatcher.on('finish', () => {
                 connection.disconnect();
