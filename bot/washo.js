@@ -68,6 +68,7 @@ client.on('message', async message => {
 		console.error(error);
 		message.reply('There was an error trying to execute that command!');
 	}
+
 });
 
 // // Every time someone enters the voice channel, the bot checks this function
