@@ -7,6 +7,7 @@ const { token } = require('./token.json');
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
 const cooldowns = new Discord.Collection();
+let connection = null;
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
 for (const file of commandFiles) {
@@ -86,47 +87,28 @@ client.on('message', async message => {
 
 });
 
-// // Every time someone enters the voice channel, the bot checks this function
-// client.on('voiceStateUpdate', (oldMember, newMember) => {
-// 	let newUserChannel = newMember.voiceChannel
-// 	let oldUserChannel = oldMember.voiceChannel
+client.on('voiceStateUpdate', async (oldState, newState) => {
+	try {
+		if (newState.member.voice.channel && newState.id != client.user.id) {
+			connection = await newState.member.voice.channel.join();
+			if (connection && connection.speaking.bitfield < 1) {
+				const dispatcher = connection.play(fs.createReadStream('resources/melacta.ogg'), { volume: 1 });
+			}
+		} else if (oldState.member.voice.channel === null && oldState.id != client.user.id) {
+			if (connection && connection.speaking.bitfield < 1) {
+				const dispatcher = connection.play(fs.createReadStream('resources/bye.ogg'), { volume: 1.25 });
+			}
+		}
+	} catch (e) { console.error(e) }
+});
 
-// 	// Here we check if an user enters
-// 	if (oldUserChannel === undefined && newUserChannel !== undefined) {
-// 		const voiceChannel = client.channels.get("113743932361277443");
-// 		if (newMember.id != "666607347128467477") {
-// 			const date = new Date();
-// 			const minutes = (date.getMinutes() < 10 ? '0' : '') + date.getMinutes();
-// 			console.log(`${newMember.user.username} has joined the voice channel at ${date.getHours()}:${minutes}.`);
-// 		}
-// 		voiceChannel.join().then(connection => {
-// 			const stream = ('audio/melacta.mp3');
-// 			const dispatcher = connection.playStream(stream);
-// 		});
+process
+	.on('unhandledRejection', (reason, p) => {
+		console.error(reason, 'Unhandled Rejection at Promise', p);
+	})
+	.on('uncaughtException', err => {
+		console.error(err, 'Uncaught Exception thrown');
+		process.exit(1);
+	});
 
-// 	}
-
-// 	// Here we check when an user leaves
-// 	else if (newUserChannel === undefined) {
-// 		const voiceChannel = client.channels.get("113743932361277443");
-// 		if (oldMember.id != "666607347128467477") {
-// 			const date = new Date();
-// 			const minutes = (date.getMinutes() < 10 ? '0' : '') + date.getMinutes();
-// 			console.log(`${newMember.user.username} has left the voice channel at ${date.getHours()}:${minutes}.`);
-// 		}
-// 		if (oldMember.id != "666607347128467477") {
-// 			voiceChannel.join().then(connection => {
-// 				const stream = ('audio/horn.mp3');
-// 				const dispatcher = connection.playStream(stream);
-// 			});
-// 		}
-// 	}
-//})
-
-// process.on('unhandledRejection', error => {
-// 	console.log('---------------------------');
-// 	console.error('UNHANDLED PROMISE REJECTION:', error);
-// });
-
-// Actual log in of the bot with its access token
 client.login(token);

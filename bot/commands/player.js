@@ -17,7 +17,7 @@ module.exports = {
             };
             const filter = (reaction, user) => ['⏸️', '▶️', '⏹️'].indexOf(reaction.emoji.name) > -1 && !user.bot;
             dispatcher.on('start', () => {
-                message.channel.send(`Now playing: *${song.title}*`).then(msg => {
+                message.channel.send(`Now playing: **${song.title}**`).then(msg => {
                     msg.react('⏸️');
                     msg.react('▶️');
                     msg.react('⏹️');
@@ -25,7 +25,7 @@ module.exports = {
                     collector.on('collect', r => {
                         switch (r.emoji.name) {
                             case '⏸️':
-                                dispatcher.pause();
+                                dispatcher.pause(true);
                                 break;
                             case '▶️':
                                 dispatcher.resume();
