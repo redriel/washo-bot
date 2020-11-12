@@ -9,10 +9,9 @@ module.exports = {
     aliases: ['j', 'jbox'],
     description: 'Play the old classic Midnight, the Stars and You',
     async execute(message, args) {
-
+        const mp3FileDuration = await mp3Duration('resources/midnight.mp3') * 1000;
         if (message.member.voice.channel) {
             const connection = await message.member.voice.channel.join();
-            let mp3FileDuration = await mp3Duration('resources/midnight.mp3') * 1000;
             const dispatcher = connection.play(fs.createReadStream('resources/midnight.mp3'), { currentVolume: 0.35 });
             const filter = (reaction, user) => ['⏸️', '▶️', '⏹️', '🔉', '🔊'].indexOf(reaction.emoji.name) > -1 && !user.bot;
             dispatcher.on('start', () => {
