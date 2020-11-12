@@ -1,6 +1,6 @@
 const ytdl = require('ytdl-core-discord');
-const { msgExpireTime, defaultVolume } = require('./../config.json');
-let currentVolume = defaultVolume;
+const { msgExpireTime, defaultPlayerVolume } = require('./../config.json');
+let currentVolume = defaultPlayerVolume;
 
 module.exports = {
     name: 'youtube',
@@ -48,7 +48,7 @@ module.exports = {
                                 break;
                             case '🔊':
                                 currentVolume < 1.75 ? currentVolume += 0.2 : currentVolume;
-                                dispatcher.setVolume(defaultVolume);
+                                dispatcher.setVolume(currentVolume);
                                 r.users.remove(r.users.cache.filter(u => !u.bot).first());
                                 break;
                             default: r.users.remove(r.users.cache.filter(u => !u.bot).first());

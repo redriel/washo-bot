@@ -1,5 +1,7 @@
 const fs = require('fs');
-const { msgExpireTime } = require('./../config.json');
+const { msgExpireTime, defaultJukeboxVolume } = require('./../config.json');
+let currentVolume = defaultJukeboxVolume;
+const midnightLenght = 207000;
 
 module.exports = {
     name: 'jukebox',
@@ -9,14 +11,46 @@ module.exports = {
 
         if (message.member.voice.channel) {
             const connection = await message.member.voice.channel.join();
-            // const userVolume = args.find(a => parseInt(a));
-            // console.log(userVolume);
-            const dispatcher = connection.play(fs.createReadStream('resources/midnight.mp3'), { volume: 0.35 });
+            const dispatcher = connection.play(fs.createReadStream('resources/midnight.mp3'), { currentVolume: 0.35 });
+            const filter = (reaction, user) => ['⏸️', '▶️', '⏹️', '🔉', '🔊'].indexOf(reaction.emoji.name) > -1 && !user.bot;
             dispatcher.on('start', () => {
-                return message.channel
-                    .send('Now playing an old time classic.')
-                    .then(msg => { msg.delete({ timeout: msgExpireTime }) })
-                    .catch(console.error);
+                message.channel.send('Now playing an old time classic.').then(msg => {
+                    msg.react('⏸️');
+                    msg.react('▶️');
+                    msg.react('⏹️');
+                    msg.react('🔉');
+                    msg.react('🔊');
+                    msg.delete({ timeout: midnightLenght });
+                    const collector = msg.createReactionCollector(filter, { time: midnightLenght });
+                    collector.on('collect', r => {
+                        switch (r.emoji.name) {
+                            case '⏸️':
+                                dispatcher.pause(true);
+                                r.users.remove(r.users.cache.filter(u => !u.bot).first());
+                                break;
+                            case '▶️':
+                                dispatcher.resume();
+                                r.users.remove(r.users.cache.filter(u => !u.bot).first());
+                                break;
+                            case '⏹️':
+                                connection.disconnect();
+                                r.users.remove(r.users.cache.filter(u => !u.bot).first());
+                                msg.delete();
+                                break;
+                            case '🔉':
+                                currentVolume > 0.25 ? currentVolume -= 0.2 : currentVolume;
+                                dispatcher.setVolume(currentVolume);
+                                r.users.remove(r.users.cache.filter(u => !u.bot).first());
+                                break;
+                            case '🔊':
+                                currentVolume < 1.75 ? currentVolume += 0.2 : currentVolume;
+                                dispatcher.setVolume(currentVolume);
+                                r.users.remove(r.users.cache.filter(u => !u.bot).first());
+                                break;
+                            default: r.users.remove(r.users.cache.filter(u => !u.bot).first());
+                        }
+                    });
+                });
             });
             dispatcher.on('finish', () => {
                 connection.disconnect();
@@ -25,7 +59,7 @@ module.exports = {
         } else {
             return message.channel
                 .send(`No one is listening, and I'm feeling lazy.`)
-                .then(msg => { msg.delete({ timeout: msgExpireTime }) })
+                .then(msg => { msg.delete({ timeout: midnightLenght }) })
                 .catch(console.error);
         }
     },
