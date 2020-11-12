@@ -1,5 +1,5 @@
 const fs = require('fs');
-const { msgExpire } = require('./../config.json');
+const { msgExpireTime } = require('./../config.json');
 
 module.exports = {
     name: 'jukebox',
@@ -15,7 +15,7 @@ module.exports = {
             dispatcher.on('start', () => {
                 return message.channel
                     .send('Now playing an old time classic.')
-                    .then(msg => { msg.delete({ timeout: msgExpire }) })
+                    .then(msg => { msg.delete({ timeout: msgExpireTime }) })
                     .catch(console.error);
             });
             dispatcher.on('finish', () => {
@@ -25,7 +25,7 @@ module.exports = {
         } else {
             return message.channel
                 .send(`No one is listening, and I'm feeling lazy.`)
-                .then(msg => { msg.delete({ timeout: msgExpire }) })
+                .then(msg => { msg.delete({ timeout: msgExpireTime }) })
                 .catch(console.error);
         }
     },

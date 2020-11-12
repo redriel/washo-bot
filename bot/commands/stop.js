@@ -1,4 +1,4 @@
-const { msgExpire } = require('./../config.json');
+const { msgExpireTime } = require('./../config.json');
 
 module.exports = {
     name: 'stop',
@@ -11,7 +11,7 @@ module.exports = {
         } else {
             return message.channel
                 .send(`I'm not in the voice channel, I can't stop a shit.`)
-                .then(msg => { msg.delete({ timeout: msgExpire }) })
+                .then(msg => { msg.delete({ timeout: msgExpireTime }) })
                 .catch(console.error);
         }
     }

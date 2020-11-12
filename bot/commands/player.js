@@ -1,9 +1,10 @@
 const ytdl = require('ytdl-core-discord');
-const { msgExpire } = require('./../config.json');
+const { msgExpireTime, defaultVolume } = require('./../config.json');
+let currentVolume = defaultVolume;
 
 module.exports = {
     name: 'youtube',
-    aliases: ['y', 'play'],
+    aliases: ['y', 'play', 'p'],
     description: 'Play music from youtube',
     async execute(message, args) {
         try {
@@ -15,25 +16,42 @@ module.exports = {
                 url: songInfo.videoDetails.video_url,
                 length: songInfo.videoDetails.lengthSeconds
             };
-            const filter = (reaction, user) => ['⏸️', '▶️', '⏹️'].indexOf(reaction.emoji.name) > -1 && !user.bot;
+            const filter = (reaction, user) => ['⏸️', '▶️', '⏹️', '🔉', '🔊'].indexOf(reaction.emoji.name) > -1 && !user.bot;
             dispatcher.on('start', () => {
                 message.channel.send(`Now playing: **${song.title}**`).then(msg => {
                     msg.react('⏸️');
                     msg.react('▶️');
                     msg.react('⏹️');
+                    msg.react('🔉');
+                    msg.react('🔊');
+                    msg.delete({ timeout: song.length * 1000 });
                     const collector = msg.createReactionCollector(filter, { time: song.length * 1000 });
                     collector.on('collect', r => {
                         switch (r.emoji.name) {
                             case '⏸️':
                                 dispatcher.pause(true);
+                                r.users.remove(r.users.cache.filter(u => !u.bot).first());
                                 break;
                             case '▶️':
                                 dispatcher.resume();
+                                r.users.remove(r.users.cache.filter(u => !u.bot).first());
                                 break;
                             case '⏹️':
                                 connection.disconnect();
+                                r.users.remove(r.users.cache.filter(u => !u.bot).first());
+                                msg.delete();
                                 break;
-                            default:
+                            case '🔉':
+                                currentVolume > 0.25 ? currentVolume -= 0.2 : currentVolume;
+                                dispatcher.setVolume(currentVolume);
+                                r.users.remove(r.users.cache.filter(u => !u.bot).first());
+                                break;
+                            case '🔊':
+                                currentVolume < 1.75 ? currentVolume += 0.2 : currentVolume;
+                                dispatcher.setVolume(defaultVolume);
+                                r.users.remove(r.users.cache.filter(u => !u.bot).first());
+                                break;
+                            default: r.users.remove(r.users.cache.filter(u => !u.bot).first());
                         }
                     });
                 });
@@ -45,8 +63,10 @@ module.exports = {
         } catch (error) {
             console.error(error);
             return message.channel
-                .then(msg => { msg.delete({ timeout: msgExpire }) })
                 .send(`The URL ${args[0]} is invalid.`)
+                .then(msg => {
+                    msg.delete({ timeout: msgExpireTime });
+                })
                 .catch(console.error);
         }
     },

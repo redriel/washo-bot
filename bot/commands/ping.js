@@ -1,4 +1,4 @@
-const { msgExpire } = require('./../config.json');
+const { msgExpireTime } = require('./../config.json');
 
 module.exports = {
 	name: 'ping',
@@ -7,7 +7,7 @@ module.exports = {
 	execute(message, args) {
 		message.channel
 			.send('Pong.')
-			.then(msg => { msg.delete({ timeout: msgExpire }) })
+			.then(msg => { msg.delete({ timeout: msgExpireTime }) })
 			.catch(console.error);
 	},
 };
