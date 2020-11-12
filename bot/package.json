@@ -5,6 +5,7 @@
         "discord.js": "^12.4.1",
         "ffmpeg": "0.0.4",
         "ffmpeg-static": "^4.2.7",
+        "mp3-duration": "^1.1.0",
         "sequelize": "^5.21.6",
         "sodium": "^3.0.2",
         "sqlite3": "^4.1.1",

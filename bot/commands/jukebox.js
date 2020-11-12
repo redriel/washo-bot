@@ -1,4 +1,5 @@
 const fs = require('fs');
+const mp3Duration = require('mp3-duration');
 const { msgExpireTime, defaultJukeboxVolume } = require('./../config.json');
 let currentVolume = defaultJukeboxVolume;
 const midnightLenght = 207000;
@@ -11,6 +12,7 @@ module.exports = {
 
         if (message.member.voice.channel) {
             const connection = await message.member.voice.channel.join();
+            let mp3FileDuration = await mp3Duration('resources/midnight.mp3') * 1000;
             const dispatcher = connection.play(fs.createReadStream('resources/midnight.mp3'), { currentVolume: 0.35 });
             const filter = (reaction, user) => ['⏸️', '▶️', '⏹️', '🔉', '🔊'].indexOf(reaction.emoji.name) > -1 && !user.bot;
             dispatcher.on('start', () => {
@@ -20,8 +22,8 @@ module.exports = {
                     msg.react('⏹️');
                     msg.react('🔉');
                     msg.react('🔊');
-                    msg.delete({ timeout: midnightLenght });
-                    const collector = msg.createReactionCollector(filter, { time: midnightLenght });
+                    msg.delete({ timeout: mp3FileDuration + 1000 });
+                    const collector = msg.createReactionCollector(filter, { time: mp3FileDuration });
                     collector.on('collect', r => {
                         switch (r.emoji.name) {
                             case '⏸️':
@@ -59,7 +61,7 @@ module.exports = {
         } else {
             return message.channel
                 .send(`No one is listening, and I'm feeling lazy.`)
-                .then(msg => { msg.delete({ timeout: midnightLenght }) })
+                .then(msg => { msg.delete({ timeout: mp3FileDuration }) })
                 .catch(console.error);
         }
     },
