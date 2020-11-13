@@ -7,8 +7,7 @@ module.exports = {
 	execute(message, args) {
 		const filter = (reaction, user) => ['⬆️', '⬇️'].indexOf(reaction.emoji.name) > -1 && !user.bot;
 		message.channel
-			.send('test')
-			// .send('▂▃▅▇█▓▒░۩۞۩   **S A M A R I O**   ۩۞۩░▒▓█▇▅▃▂')
+			.send('▂▃▅▇█▓▒░۩۞۩   **S A M A R I O**   ۩۞۩░▒▓█▇▅▃▂')
 			.then(msg => {
 				msg.react('⬆️');
 				msg.react('⬇️');
@@ -17,11 +16,9 @@ module.exports = {
 				collector.on('collect', r => {
 					switch (r.emoji.name) {
 						case '⬆️':
-							console.log('⬆️');
 							r.users.remove(r.users.cache.filter(u => !u.bot).first());
 							break;
 						case '⬇️':
-							console.log('⬇️');
 							r.users.remove(r.users.cache.filter(u => !u.bot).first());
 							break;
 						default:

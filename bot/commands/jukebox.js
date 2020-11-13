@@ -15,7 +15,7 @@ module.exports = {
             const dispatcher = connection.play(fs.createReadStream('resources/midnight.mp3'), { currentVolume: 0.35 });
             const filter = (reaction, user) => ['⏸️', '▶️', '⏹️', '🔉', '🔊'].indexOf(reaction.emoji.name) > -1 && !user.bot;
             dispatcher.on('start', () => {
-                message.channel.send('Now playing an old time classic.').then(msg => {
+                message.channel.send('Now playing an old time classic.', { code: true }).then(msg => {
                     msg.react('⏸️');
                     msg.react('▶️');
                     msg.react('⏹️');

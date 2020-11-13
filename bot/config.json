@@ -8,5 +8,7 @@
     "token": "YOUR-TOKEN-HERE",
     "msgExpireTime" : 30000,
     "defaultPlayerVolume": 1,
-    "defaultJukeboxVolume": 0.35
+    "defaultJukeboxVolume": 0.35,
+    "currencyUnit": "💠",
+    "startingCurrency": 10
 }

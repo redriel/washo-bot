@@ -1,13 +1,15 @@
 const fs = require('fs');
 const Discord = require('discord.js');
-// Change in release the token path
+const { users, shop } = require('./db_schema');
 const { prefix, msgExpireTime } = require('./config.json');
-const { token } = require('./token.json');
+const { token } = require('./token.json'); // Change in release the token path
+const { Op } = require('sequelize');
+const currency = new Discord.Collection();
 const client = new Discord.Client();
-client.commands = new Discord.Collection();
-const cooldowns = new Discord.Collection();
-let connection = null;
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+const cooldowns = new Discord.Collection();
+client.commands = new Discord.Collection();
+let connection, voiceChannel = null;
 
 for (const file of commandFiles) {
 	const command = require(`./commands/${file}`);
@@ -17,6 +19,8 @@ for (const file of commandFiles) {
 // Console log reports the successful log in.
 client.once('ready', async () => {
 	console.log(`Logged in as ${client.user.tag}!`);
+	const storedBalances = await users.findAll();
+	storedBalances.forEach(b => currency.set(b.user_id, b));
 });
 
 // Every time a message is typed, this procedure starts.
@@ -90,11 +94,13 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
 	try {
 		if (newState.member.voice.channel && newState.id != client.user.id) {
 			connection = await newState.member.voice.channel.join();
+			voiceChannel = newState.member.voice.channel;
 			if (connection && connection.speaking.bitfield < 1) {
 				const dispatcher = connection.play(fs.createReadStream('resources/melacta.ogg'), { volume: 1 });
 			}
 		} else if (oldState.member.voice.channel === null && oldState.id != client.user.id) {
 			if (connection && connection.speaking.bitfield < 1) {
+				voiceChannel.join();
 				const dispatcher = connection.play(fs.createReadStream('resources/bye.ogg'), { volume: 1.25 });
 			}
 		}
@@ -111,3 +117,5 @@ process
 	});
 
 client.login(token);
+
+module.exports = { currency, client };
