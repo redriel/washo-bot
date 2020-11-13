@@ -29,7 +29,8 @@ module.exports = {
                 .catch(console.error);
         } else {
             return message.channel
-                .send(`**${target.tag}**, you are not registered.\nPlease insert the command \`.register\``)
+                .send(`**${target.tag}**, you are not registered.\n` +
+                    `Please insert the command \`.register\``)
                 .then(msg => {
                     msg.delete({ timeout: msgExpireTime })
                 })

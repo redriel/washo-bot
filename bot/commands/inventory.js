@@ -32,7 +32,8 @@ module.exports = {
         const user = await users.findOne({ where: { user_id: target.id } });
         if (user == null || user == undefined) {
             return message.channel
-                .send(`**${target.tag}**, you are not registered.\nPlease insert the command \`.register\``)
+                .send(`**${target.tag}**, you are not registered.\n` +
+                    `Please insert the command \`.register\``)
                 .then(msg => {
                     msg.delete({ timeout: msgExpireTime })
                 })

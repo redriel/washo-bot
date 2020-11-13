@@ -1,4 +1,5 @@
 const ytdl = require('ytdl-core-discord');
+const humanizeDuration = require('humanize-duration');
 const { msgExpireTime, defaultPlayerVolume } = require('./../config.json');
 let currentVolume = defaultPlayerVolume;
 
@@ -18,7 +19,13 @@ module.exports = {
             };
             const filter = (reaction, user) => ['⏸️', '▶️', '⏹️', '🔉', '🔊'].indexOf(reaction.emoji.name) > -1 && !user.bot;
             dispatcher.on('start', () => {
-                message.channel.send(`Now playing: **${song.title}**`).then(msg => {
+                message.channel.send({
+                    embed: {
+                        description: `Now playing from YouTube  🌐\n`+
+                        `Title: **${song.title}**\n`+
+                        `Duration: **${humanizeDuration(song.length * 1000)}**`
+                    }
+                }).then(msg => {
                     msg.react('⏸️');
                     msg.react('▶️');
                     msg.react('⏹️');

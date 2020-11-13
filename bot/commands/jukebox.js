@@ -1,5 +1,6 @@
 const fs = require('fs');
 const mp3Duration = require('mp3-duration');
+const humanizeDuration = require('humanize-duration');
 const { msgExpireTime, defaultJukeboxVolume } = require('./../config.json');
 let currentVolume = defaultJukeboxVolume;
 const midnightLenght = 207000;
@@ -15,7 +16,13 @@ module.exports = {
             const dispatcher = connection.play(fs.createReadStream('resources/midnight.mp3'), { currentVolume: 0.35 });
             const filter = (reaction, user) => ['⏸️', '▶️', '⏹️', '🔉', '🔊'].indexOf(reaction.emoji.name) > -1 && !user.bot;
             dispatcher.on('start', () => {
-                message.channel.send('Now playing an old time classic.', { code: true }).then(msg => {
+                'Now playing an old time classic 📻'
+                message.channel.send({
+                    embed: {
+                        description: `Now playing an old time classic  📻\n` +
+                            `Duration: **${humanizeDuration(mp3FileDuration)}**\n`
+                    }
+                }).then(msg => {
                     msg.react('⏸️');
                     msg.react('▶️');
                     msg.react('⏹️');

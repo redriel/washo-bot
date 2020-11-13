@@ -20,7 +20,9 @@ module.exports = {
             const newUser = await users.create({ user_id: target.id, balance: startingCurrency });
             newUser.save();
             return message.channel
-                .send(`**${target.tag}**, thank you for registering!.\nAs a thank you, here's **10** ${currencyUnit}!\nYou can see your balance anytime by typing the command \`.balance\``)
+                .send(`**${target.tag}**, thank you for registering!.\n` +
+                    `As a thank you, here's **10** ${currencyUnit}!\n` +
+                    `You can see your balance anytime by typing the command \`.balance\``)
                 .then(msg => {
                     msg.delete({ timeout: msgExpireTime })
                 })
