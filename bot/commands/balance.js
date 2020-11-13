@@ -17,7 +17,7 @@ async function loadBalance(id) {
 
 module.exports = {
     name: 'balance',
-    aliases: ['bal', 'b'],
+    aliases: ['bal'],
     description: 'Show the users its balanace',
     async execute(message, args) {
         const target = message.author;
@@ -31,9 +31,7 @@ module.exports = {
             return message.channel
                 .send(`**${target.tag}**, you are not registered.\n` +
                     `Please insert the command \`.register\``)
-                .then(msg => {
-                    msg.delete({ timeout: msgExpireTime })
-                })
+                .then(msg => { msg.delete({ timeout: msgExpireTime }) })
                 .catch(console.error);
         }
     },

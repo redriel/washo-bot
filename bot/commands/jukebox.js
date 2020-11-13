@@ -1,9 +1,8 @@
 const fs = require('fs');
 const mp3Duration = require('mp3-duration');
 const humanizeDuration = require('humanize-duration');
-const { msgExpireTime, defaultJukeboxVolume } = require('./../config.json');
+const { defaultJukeboxVolume } = require('./../config.json');
 let currentVolume = defaultJukeboxVolume;
-const midnightLenght = 207000;
 
 module.exports = {
     name: 'jukebox',

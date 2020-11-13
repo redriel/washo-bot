@@ -1,4 +1,5 @@
 const { msgExpireTime } = require('./../config.json');
+const Discord = require('discord.js');
 
 module.exports = {
 	name: 'test',
@@ -7,13 +8,17 @@ module.exports = {
 	execute(message, args) {
 		//const filter = (reaction, user) => ['⬆️', '⬇️'].indexOf(reaction.emoji.name) > -1 && !user.bot;
 		const msg = "First Header | Second Header\n------------ | -------------\nContent from cell 1 | Content from cell 2\nContent in the first column | Content in the second column";
+
+		message.channel.send({ embed: {
+			title:'text',
+			files: [{
+				attachment: './../bot/resources/test.html',
+				name: 'test.html'
+			  }]
+		} });
+
 		message.channel.send({
-			embed: {
-				description: `Markdown | Less | Pretty\n`+
-				`--- | --- | ---\n`+
-				`*Still* | \`renders\` | **nicely**\n`+
-				`1 | 2 | 3`
-			}
+			embed
 		});
 
 		// 		First Header | Second Header

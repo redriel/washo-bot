@@ -28,12 +28,16 @@ module.exports = {
     aliases: ['i', 'items'],
     description: 'Show the users its inventory',
     async execute(message, args) {
-        const target = message.mentions.users.first() || message.author;
+        const target = message.author;
         const user = await users.findOne({ where: { user_id: target.id } });
         if (user == null || user == undefined) {
             return message.channel
-                .send(`**${target.tag}**, you are not registered.\n` +
-                    `Please insert the command \`.register\``)
+                .send({
+                    embed: {
+                        description: `**${target.tag}**, you are not registered.\n` +
+                            `Please insert the command \`.register\``
+                    }
+                })
                 .then(msg => {
                     msg.delete({ timeout: msgExpireTime })
                 })
@@ -41,7 +45,7 @@ module.exports = {
         }
         const items = await user.getItems();
         if (!items.length) {
-            return message.channel.send(`**${target.tag}**, you don't have any belongings!`)
+            return message.channel.send({ embed: { description: `**${target.tag}**, you don't have any belongings!` } })
                 .then(msg => {
                     msg.delete({ timeout: msgExpireTime })
                 })
