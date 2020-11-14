@@ -14,7 +14,7 @@ module.exports = {
                 })
                 .catch(console.error);
         } else {
-            return message.channel.send(items.map(item => `${item.name}: ${item.cost} ${currencyUnit}`)
+            return message.channel.send(items.map(item => `#${item.id} ${item.name}: ${item.cost} ${currencyUnit}`)
                 .join('\n'), { code: true })
                 .then(msg => {
                     msg.delete({ timeout: msgExpireTime })
