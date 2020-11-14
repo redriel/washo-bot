@@ -64,17 +64,17 @@ async function rolldice(message, user, wager) {
     await currency.add(message.author.id, +wager);
     if ([1, 2, 3].indexOf(result) > -1) {
         return message.channel
-            .send({ embed: { description: `It's a **${result}** 🎲!\nSorry **${user.tag}**, you lost.\n` } })
+            .send({ embed: { description: `You bet **${wager}** ${currencyUnit}\nIt's a **${result}** 🎲!\nSorry **${user.tag}**, you lost.\n` } })
             .then(msg => { msg.delete({ timeout: msgExpireTime }) })
             .catch(console.error);
     } else if ([5, 6].indexOf(result) > -1) {
         return message.channel
-            .send({ embed: { description: `It's a **${result}** 🎲!\nWow **${user.tag}**, you won ${wager} ${currencyUnit}!\n` } })
+            .send({ embed: { description: `You bet **${wager}** ${currencyUnit}\nIt's a **${result}** 🎲!\nWow **${user.tag}**, you won ${wager} ${currencyUnit}!\n` } })
             .then(msg => { msg.delete({ timeout: msgExpireTime }) })
             .catch(console.error);
     } else {
         return message.channel
-            .send({ embed: { description: `It's a **${result}** 🎲!\nWell **${user.tag}**, you won back your ${wager} ${currencyUnit}!\n` } })
+            .send({ embed: { description: `You bet **${wager}** ${currencyUnit}\nIt's a **${result}** 🎲!\nWell **${user.tag}**, you won back your ${wager} ${currencyUnit}!\n` } })
             .then(msg => { msg.delete({ timeout: msgExpireTime }) })
             .catch(console.error);
     }
@@ -135,8 +135,8 @@ module.exports = {
             }
         } else {
             return message.channel
-                .send(`**${target.tag}**, please select a game you wish to play.\n` +
-                    `**Example:** \`.bet rolldice 10\``)
+                .send(({ embed: { description:`**${target.tag}**, please select a game you wish to play.\n` +
+                    `**Example:** \`.bet rolldice 10\``}}))
                 .then(msg => {
                     msg.delete({ timeout: msgExpireTime })
                 })

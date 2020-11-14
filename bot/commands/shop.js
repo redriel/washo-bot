@@ -8,7 +8,7 @@ module.exports = {
     async execute(message, args) {
         const items = await shop.findAll();
         if (items == null || items == undefined) {
-            return message.channel.send(`Apparently, there are no items in the shop. Must be thieves.`)
+            return message.channel.send(({ embed: { description:`Apparently, there are no items in the shop. Must be thieves.`}}))
                 .then(msg => {
                     msg.delete({ timeout: msgExpireTime })
                 })

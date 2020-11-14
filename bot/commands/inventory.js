@@ -51,7 +51,7 @@ module.exports = {
                 })
                 .catch(console.error);
         } else {
-            return message.channel.send(`${target.tag} currently has ${items.map(i => `${i.amount} ${i.item.name}`).join(', ')}`)
+            return message.channel.send(({ embed: { description:`${target.tag} currently has ${items.map(i => `${i.amount} ${i.item.name}`).join(', ')}`}}))
                 .then(msg => {
                     msg.delete({ timeout: msgExpireTime })
                 })

@@ -70,7 +70,7 @@ module.exports = {
         } catch (error) {
             console.error(error);
             return message.channel
-                .send(`The URL ${args[0]} is invalid.`)
+                .send(({ embed: { description:`The URL ${args[0]} is invalid.`}}))
                 .then(msg => {
                     msg.delete({ timeout: msgExpireTime });
                 })

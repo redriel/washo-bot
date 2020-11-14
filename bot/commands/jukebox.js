@@ -65,7 +65,7 @@ module.exports = {
             dispatcher.on('error', console.error);
         } else {
             return message.channel
-                .send(`No one is listening, and I'm feeling lazy.`)
+                .send(({ embed: { description:`No one is listening, and I'm feeling lazy.`}}))
                 .then(msg => { msg.delete({ timeout: mp3FileDuration }) })
                 .catch(console.error);
         }

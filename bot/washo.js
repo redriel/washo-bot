@@ -49,7 +49,7 @@ client.on('message', async message => {
 			reply += `\nThe proper usage would be: \`${prefix}${command.name} ${command.usage}\``;
 		}
 		return message.channel
-			.send(reply)
+			.send({ embed: { description: reply } })
 			.then(msg => { msg.delete({ timeout: msgExpireTime }) })
 			.catch(console.error);
 	}

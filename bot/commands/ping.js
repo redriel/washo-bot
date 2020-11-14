@@ -6,7 +6,7 @@ module.exports = {
 	description: 'Ping!',
 	execute(message, args) {
 		message.channel
-			.send('Pong.')
+			.send(({ embed: { description:'Pong.'}}))
 			.then(msg => { msg.delete({ timeout: msgExpireTime }) })
 			.catch(console.error);
 	},
