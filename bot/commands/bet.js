@@ -37,6 +37,7 @@ async function coinflip(user, wager) {
 async function rolldice(message, user, wager) {
     await loadBalance(user.id);
     const currentBalance = currency.getBalance(user.id);
+    const initialWager = wager;
     if (Number.isNaN(wager) || wager > currentBalance || wager <= 0) {
         return message.channel
             .send({ embed: { description: `Sorry **${message.author}**, that is an invalid amount of ${currencyUnit}` } })
@@ -64,17 +65,35 @@ async function rolldice(message, user, wager) {
     await currency.add(message.author.id, +wager);
     if ([1, 2, 3].indexOf(result) > -1) {
         return message.channel
-            .send({ embed: { description: `You bet **${wager}** ${currencyUnit}\nIt's a **${result}** 🎲!\nSorry **${user.tag}**, you lost.\n` } })
+            .send({
+                embed: {
+                    description: `You bet **${initialWager}** ${currencyUnit}\nIt's a **${result}** 🎲!\n` +
+                        `Sorry **${user.username}**, you lost.\n` +
+                        `Your current balance is **${currency.getBalance(user.id)}** ${currencyUnit}`
+                }
+            })
             .then(msg => { msg.delete({ timeout: msgExpireTime }) })
             .catch(console.error);
     } else if ([5, 6].indexOf(result) > -1) {
         return message.channel
-            .send({ embed: { description: `You bet **${wager}** ${currencyUnit}\nIt's a **${result}** 🎲!\nWow **${user.tag}**, you won ${wager} ${currencyUnit}!\n` } })
+            .send({
+                embed: {
+                    description: `You bet **${initialWager}** ${currencyUnit}\n` +
+                        `It's a **${result}** 🎲!\nWow **${user.username}**, you won ${wager} ${currencyUnit}!\n` +
+                        `Your current balance is **${currency.getBalance(user.id)}** ${currencyUnit}`
+                }
+            })
             .then(msg => { msg.delete({ timeout: msgExpireTime }) })
             .catch(console.error);
     } else {
         return message.channel
-            .send({ embed: { description: `You bet **${wager}** ${currencyUnit}\nIt's a **${result}** 🎲!\nWell **${user.tag}**, you won back your ${wager} ${currencyUnit}!\n` } })
+            .send({
+                embed: {
+                    description: `You bet **${initialWager}** ${currencyUnit}\n` +
+                        `It's a **${result}** 🎲!\nWell **${user.username}**, you won back your ${wager} ${currencyUnit}!\n` +
+                        `Your current balance is **${currency.getBalance(user.id)}** ${currencyUnit}`
+                }
+            })
             .then(msg => { msg.delete({ timeout: msgExpireTime }) })
             .catch(console.error);
     }
@@ -93,7 +112,7 @@ module.exports = {
             return message.channel
                 .send({
                     embed: {
-                        description: `**${target.tag}**, you are not registered.\n` +
+                        description: `**${target.username}**, you are not registered.\n` +
                             `Please insert the command \`.register\``
                     }
                 })
@@ -123,7 +142,7 @@ module.exports = {
                 return message.channel
                     .send({
                         embed: {
-                            description: `**${target.tag}**, please insert an amount of ${currencyUnit} ` +
+                            description: `**${target.username}**, please insert an amount of ${currencyUnit} ` +
                                 `you desire to bet after selecting the game\n` +
                                 `**Example:** \`.bet rolldice 10\``
                         }
@@ -135,8 +154,12 @@ module.exports = {
             }
         } else {
             return message.channel
-                .send(({ embed: { description:`**${target.tag}**, please select a game you wish to play.\n` +
-                    `**Example:** \`.bet rolldice 10\``}}))
+                .send(({
+                    embed: {
+                        description: `**${target.username}**, please select a game you wish to play.\n` +
+                            `**Example:** \`.bet rolldice 10\``
+                    }
+                }))
                 .then(msg => {
                     msg.delete({ timeout: msgExpireTime })
                 })

@@ -34,7 +34,7 @@ module.exports = {
             return message.channel
                 .send({
                     embed: {
-                        description: `**${target.tag}**, you are not registered.\n` +
+                        description: `**${target.username}**, you are not registered.\n` +
                             `Please insert the command \`.register\``
                     }
                 })
@@ -45,13 +45,13 @@ module.exports = {
         }
         const items = await user.getItems();
         if (!items.length) {
-            return message.channel.send({ embed: { description: `**${target.tag}**, you don't have any belongings!` } })
+            return message.channel.send({ embed: { description: `**${target.username}**, you don't have any belongings!` } })
                 .then(msg => {
                     msg.delete({ timeout: msgExpireTime })
                 })
                 .catch(console.error);
         } else {
-            return message.channel.send(({ embed: { description:`${target.tag} currently has ${items.map(i => `${i.amount} ${i.item.name}`).join(', ')}`}}))
+            return message.channel.send(({ embed: { description:`${target.username} currently has ${items.map(i => `${i.amount} ${i.item.name}`).join(', ')}`}}))
                 .then(msg => {
                     msg.delete({ timeout: msgExpireTime })
                 })

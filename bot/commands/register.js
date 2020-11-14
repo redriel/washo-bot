@@ -11,7 +11,7 @@ module.exports = {
         const target = message.author;
         const user = await users.findOne({ where: { user_id: target.id } });
         if (user) {
-            return message.channel.send(({ embed: { description:`**${target.tag}**, you are already registered.`}}))
+            return message.channel.send(({ embed: { description:`**${target.username}**, you are already registered.`}}))
                 .then(msg => {
                     msg.delete({ timeout: msgExpireTime })
                 })
@@ -20,7 +20,7 @@ module.exports = {
             const newUser = await users.create({ user_id: target.id, balance: startingCurrency });
             newUser.save();
             return message.channel
-                .send(({ embed: { description:`**${target.tag}**, thank you for registering!.\n` +
+                .send(({ embed: { description:`**${target.username}**, thank you for registering!.\n` +
                     `As a thank you, here's **10** ${currencyUnit}!\n` +
                     `You can see your balance anytime by typing the command \`.balance\``}}))
                 .then(msg => {
