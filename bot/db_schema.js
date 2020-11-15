@@ -26,6 +26,17 @@ users.prototype.addItem = async function(item) {
 	return inventories.create({ user_id: this.user_id, item_id: item.id, amount: 1 });
 };
 
+users.prototype.removeItem = async function(item) {
+	const userItem = await inventories.findOne({
+		where: { user_id: this.user_id, item_id: item.id },
+	});
+
+	if (userItem) {
+		userItem.amount == 0? userItem.amount = 0 : userItem.amount -= 1;
+		return userItem.save();
+	}
+};
+
 users.prototype.getItems = function() {
 	return inventories.findAll({
 		where: { user_id: this.user_id },

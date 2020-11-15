@@ -21,7 +21,7 @@ module.exports = {
             newUser.save();
             return message.channel
                 .send(({ embed: { description:`**${target.username}**, thank you for registering!.\n` +
-                    `As a thank you, here's **10** ${currencyUnit}!\n` +
+                    `As a thank you, here's **${startingCurrency}** ${currencyUnit}!\n` +
                     `You can see your balance anytime by typing the command \`.balance\``}}))
                 .then(msg => {
                     msg.delete({ timeout: msgExpireTime })

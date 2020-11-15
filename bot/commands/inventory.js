@@ -51,7 +51,18 @@ module.exports = {
                 })
                 .catch(console.error);
         } else {
-            return message.channel.send(({ embed: { description:`${target.username} currently has ${items.map(i => `${i.amount} ${i.item.name}${i.amount > 1 ? `s`: ``}`).join(', ')}`}}))
+            if (items.filter(i => i.amount > 0).length > 0) {
+                return message.channel.send(({
+                    embed: {
+                        description: `${target.username} currently has: \n` +
+                            ` - ${items.filter(i => i.amount > 0).map(i => `${i.amount} ${i.item.name}${i.amount > 1 ? `s` : ``}`).join('\n')}`
+                    }
+                }))
+                    .then(msg => {
+                        msg.delete({ timeout: msgExpireTime })
+                    })
+                    .catch(console.error);
+            } else return message.channel.send({ embed: { description: `**${target.username}**, you don't have any belongings!` } })
                 .then(msg => {
                     msg.delete({ timeout: msgExpireTime })
                 })

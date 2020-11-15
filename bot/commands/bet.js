@@ -92,7 +92,7 @@ async function coinflip(message, target, args) {
         return message.channel
             .send({
                 embed: {
-                    description: `Sorry **${target.username}**, the syntax of you command is invalid.\n`
+                    description: `Sorry **${target.username}**, the syntax of your command is invalid.\n`
                         + `A correct example would be \`.bet[b] head\\tail[h\\t] 10\``
                 }
             })
