@@ -3,51 +3,23 @@ const mp3Duration = require('mp3-duration');
 const humanizeDuration = require('humanize-duration');
 const { defaultJukeboxVolume } = require('./../config.json');
 const { users } = require('./../db_schema');
-const { msgExpireTime } = require('./../config.json');
 let currentVolume = defaultJukeboxVolume;
 
 module.exports = {
-    name: 'jukebox',
-    aliases: ['j', 'jbox'],
+    name: 'walkman',
+    aliases: ['ww'],
     description: 'Play the old classic Midnight, the Stars and You',
     async execute(message, args) {
         const target = message.author;
-        const mp3FileDuration = await mp3Duration('resources/midnight.mp3') * 1000;
-        const user = await users.findOne({ where: { user_id: target.id } });
-        if (!user) {
-            return message.channel
-                .send({
-                    embed: {
-                        description: `**${target.username}**, you are not registered.\n` +
-                            `Please insert the command \`.register\``
-                    }
-                })
-                .then(msg => {
-                    msg.delete({ timeout: msgExpireTime })
-                })
-                .catch(console.error);
-        }
-        const items = await user.getItems();
-        const coin = await items.filter(i => i.item.name == `jukebox coin`)[0];
-        if (coin == null || coin == undefined || coin.amount < 1) {
-            return message.channel.send({
-                embed: {
-                    description: `Sorry ${target.username}, you don't have a \`jukebox coin\`!\n` +
-                        `You can buy one from the shop!\n` +
-                        `To see what's on sale, please digit \`.shop\`\n` +
-                        `You can buy an item by typing \`.buy [id/name]\``
-                }
-            });
-        }
+        const mp3FileDuration = await mp3Duration('resources/chuck.mp3') * 1000;
         if (message.member.voice.channel) {
-            await user.removeItem(coin);
             const connection = await message.member.voice.channel.join();
-            const dispatcher = connection.play(fs.createReadStream('resources/midnight.mp3'), { currentVolume: 0.4 });
+            const dispatcher = connection.play(fs.createReadStream('resources/chuck.mp3'), { currentVolume: 0.4 });
             const filter = (reaction, user) => ['⏸️', '▶️', '⏹️', '🔉', '🔊'].indexOf(reaction.emoji.name) > -1 && !user.bot;
             dispatcher.on('start', () => {
                 message.channel.send({
                     embed: {
-                        description: `Now playing an old time classic  📻\n` +
+                        description: `Now playing **Chuck madonna sei scarso**  📻\n` +
                             `Duration: **${humanizeDuration(mp3FileDuration)}**\n`
                     }
                 }).then(msg => {
