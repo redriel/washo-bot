@@ -10,21 +10,21 @@ module.exports = {
     async execute(message, args) {
         const items = await shop.findAll();
         if (items == null || items == undefined) {
-            return message.channel.send(({ embed: { description: `Apparently, there are no items in the shop. Must be thieves.` } }))
+            return message.channel.send({ embed: { description: `Apparently, there are no items in the shop. Must be thieves.` } })
                 .then(msg => {
                     msg.delete({ timeout: msgExpireTime })
                 })
                 .catch(console.error);
         } else {
             data = [
-                [`ID`, `NAME`, `COST`, `QTY`,`DESCRIPTION`],
+                [`ID`, `NAME`, `COST`, `QTY`],
             ];
             items.forEach(i => {
-                data.push([i.id, i.name, i.cost, i.quantity ? i.quantity : `∞`, i.description]);
+                data.push([i.id, i.name, i.cost, i.quantity ? i.quantity : `∞`]);
             });
             const output = table(data);
             return message.channel
-                .send(`${output}`, { code: true })
+                .send(`${output}`, {code: true})
                 .then(msg => {
                     msg.delete({ timeout: msgExpireTime })
                 })

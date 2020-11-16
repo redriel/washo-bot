@@ -115,8 +115,8 @@ async function coinflip(message, target, args) {
             .send({
                 embed: {
                     description: `You bet **${wager}** ${currencyUnit}\n` +
-                        `It landed **${headOrTail}** ${headOrTail == 'head' ? `👤` : `❌`}!\n` +
-                        `**${target.username}**, you won ${2 * wager} ${currencyUnit}!\n` +
+                        `It landed **${headOrTail}** ${headOrTail == 'head' ? `👤` : `🔘`}!\n` +
+                        `**${target.username}**, you won **${2 * wager}** ${currencyUnit}!\n` +
                         `Your current balance is **${currency.getBalance(target.id)}** ${currencyUnit}`
                 }
             })
@@ -127,8 +127,8 @@ async function coinflip(message, target, args) {
             .send({
                 embed: {
                     description: `You bet **${wager}** ${currencyUnit}\n` +
-                        `It landed **${headOrTail}** ${headOrTail == 'head' ? `👤` : `❌`}!\n` +
-                        `Sorry **${target.username}**, you lost ${wager} ${currencyUnit}!\n` +
+                        `It landed **${headOrTail}** ${headOrTail == 'head' ? `👤` : `🔘`}!\n` +
+                        `Sorry **${target.username}**, you lost **${wager}** ${currencyUnit}!\n` +
                         `Your current balance is **${currency.getBalance(target.id)}** ${currencyUnit}`
                 }
             })
