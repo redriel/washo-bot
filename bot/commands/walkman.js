@@ -1,26 +1,37 @@
-const fs = require('fs');
-const mp3Duration = require('mp3-duration');
-const humanizeDuration = require('humanize-duration');
 const { defaultJukeboxVolume } = require('./../config.json');
-const { users } = require('./../db_schema');
+const random = require('random');
+let track = '';
+
 let currentVolume = defaultJukeboxVolume;
 
 module.exports = {
     name: 'walkman',
-    aliases: ['ww'],
-    description: 'Play the old classic Midnight, the Stars and You',
+    aliases: ['w', 'wk'],
+    description: 'Play the virtual walkman with online tracks',
     async execute(message, args) {
-        const target = message.author;
-        const mp3FileDuration = await mp3Duration('resources/chuck.mp3') * 1000;
         if (message.member.voice.channel) {
+            const choice = random.int(min = 1, max = 10);
+            switch (choice) {
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10: track = 'chuck'
+                    break;
+                default:
+            }
             const connection = await message.member.voice.channel.join();
-            const dispatcher = connection.play(fs.createReadStream('resources/chuck.mp3'), { currentVolume: 0.4 });
+            const dispatcher = connection.play(`https://www.mboxdrive.com/${track}.mp3`, { currentVolume: 0.4 });
             const filter = (reaction, user) => ['⏸️', '▶️', '⏹️', '🔉', '🔊'].indexOf(reaction.emoji.name) > -1 && !user.bot;
             dispatcher.on('start', () => {
                 message.channel.send({
                     embed: {
-                        description: `Now playing **Chuck madonna sei scarso**  📻\n` +
-                            `Duration: **${humanizeDuration(mp3FileDuration)}**\n`
+                        description: `Now playing **some random shit**  📻\n`
                     }
                 }).then(msg => {
                     msg.react('⏸️');
@@ -28,8 +39,7 @@ module.exports = {
                     msg.react('⏹️');
                     msg.react('🔉');
                     msg.react('🔊');
-                    msg.delete({ timeout: mp3FileDuration + 1000 });
-                    const collector = msg.createReactionCollector(filter, { time: mp3FileDuration });
+                    const collector = msg.createReactionCollector(filter);
                     collector.on('collect', r => {
                         switch (r.emoji.name) {
                             case '⏸️':
