@@ -117,5 +117,3 @@ process
 	});
 
 client.login(token);
-
-module.exports = { currency, client };

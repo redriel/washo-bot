@@ -1,6 +1,5 @@
 const { defaultJukeboxVolume } = require('./../config.json');
 const random = require('random');
-let track = '';
 
 let currentVolume = defaultJukeboxVolume;
 
@@ -10,28 +9,15 @@ module.exports = {
     description: 'Play the virtual walkman with online tracks',
     async execute(message, args) {
         if (message.member.voice.channel) {
-            const choice = random.int(min = 1, max = 10);
-            switch (choice) {
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10: track = 'chuck'
-                    break;
-                default:
-            }
+            let track = '';
+            !args.length? track = 'https://www.mboxdrive.com/chuck.mp3' : track = args[0];
             const connection = await message.member.voice.channel.join();
-            const dispatcher = connection.play(`https://www.mboxdrive.com/${track}.mp3`, { currentVolume: 0.4 });
+            const dispatcher = connection.play(`${track}`, { currentVolume: 0.4 });
             const filter = (reaction, user) => ['⏸️', '▶️', '⏹️', '🔉', '🔊'].indexOf(reaction.emoji.name) > -1 && !user.bot;
             dispatcher.on('start', () => {
                 message.channel.send({
                     embed: {
-                        description: `Now playing **some random shit**  📻\n`
+                        description: `Now playing **some random shit**  🎙️\n`
                     }
                 }).then(msg => {
                     msg.react('⏸️');
