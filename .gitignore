@@ -1,4 +1,4 @@
-bot/package-lock.json
-bot/node_modules
-bot/resources
-bot/token.json
+package-lock.json
+node_modules
+token.json
+
