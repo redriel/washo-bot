@@ -2,7 +2,7 @@ const fs = require('fs');
 const Discord = require('discord.js');
 const { users, shop } = require('./db_schema');
 const { prefix, msgExpireTime } = require('./config.json');
-const token = process.env.BOT_TOKEN
+const token = process.env.BOT_TOKEN;
 const { Op } = require('sequelize');
 const currency = new Discord.Collection();
 const client = new Discord.Client();
@@ -92,7 +92,20 @@ client.on('message', async message => {
 
 client.on('voiceStateUpdate', async (oldState, newState) => {
 	try {
-		if (newState.member.voice.channel && newState.id != client.user.id) {
+		if (newState.member.voice.channel && newState.id != client.user.id &&
+			newState.member.voice.member) {
+
+			// We check either if a user muted/unmuted or deafened/undeafened himself
+			// In that case, we don't want the bot to play the greeting
+			if (oldState.mute != newState.mute || oldState.selfMute != newState.selfMute ||
+				oldState.serverMute != newState.serverMute) {
+				return;
+			}
+			if (oldState.deaf != newState.deaf || oldState.selfDeaf != newState.selfDeaf ||
+				oldState.serverDeaf != newState.serverDeaf) {
+				return;
+			}
+
 			connection = await newState.member.voice.channel.join();
 			voiceChannel = newState.member.voice.channel;
 			if (connection && connection.speaking.bitfield < 1) {
