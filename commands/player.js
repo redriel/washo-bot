@@ -1,4 +1,4 @@
-const ytdl = require('ytdl-core-discord');
+const ytdl = require('ytdl-core');
 const humanizeDuration = require('humanize-duration');
 const { msgExpireTime, defaultPlayerVolume } = require('./../config.json');
 let currentVolume = defaultPlayerVolume;
