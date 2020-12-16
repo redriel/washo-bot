@@ -1,6 +1,6 @@
 {
     "name": "washo-bot",
-    "version": "0.0.2",
+    "version": "0.0.2.2",
     "description": "Washo is a friendly bot.",
     "main": "client.js",
     "author": "Redriel",
