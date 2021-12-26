@@ -10,7 +10,18 @@ module.exports = {
     async execute(message, args) {
         try {
             const connection = await message.member.voice.channel.join();
+<<<<<<< HEAD
             const dispatcher = connection.play(await ytdl(args[0]), { opusEncoded: true, volume: 0.5 });
+=======
+
+            joinVoiceChannel({
+                channelId: message.member.voice.channel.id,
+                guildId: message.guild.id,
+                adapterCreator: message.guild.voiceAdapterCreator
+            })
+
+            const dispatcher = joinVoiceChannel.play(await ytdl(args[0]), { opusEncoded: true, volume: 0.5 });
+>>>>>>> main
             const songInfo = await ytdl.getInfo(args[0]);
             const song = {
                 title: songInfo.videoDetails.title,
