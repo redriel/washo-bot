@@ -1,4 +1,4 @@
-const ytdl = require('ytdl-core-discord');
+const ytdl = require('ytdl-core');
 const humanizeDuration = require('humanize-duration');
 const { msgExpireTime, defaultPlayerVolume } = require('./../config.json');
 let currentVolume = defaultPlayerVolume;
@@ -10,7 +10,14 @@ module.exports = {
     async execute(message, args) {
         try {
             const connection = await message.member.voice.channel.join();
-            const dispatcher = connection.play(await ytdl(args[0]), { type: 'opus', volume: 0.5 });
+
+            joinVoiceChannel({
+                channelId: message.member.voice.channel.id,
+                guildId: message.guild.id,
+                adapterCreator: message.guild.voiceAdapterCreator
+            })
+
+            const dispatcher = joinVoiceChannel.play(await ytdl(args[0]), { opusEncoded: true, volume: 0.5 });
             const songInfo = await ytdl.getInfo(args[0]);
             const song = {
                 title: songInfo.videoDetails.title,

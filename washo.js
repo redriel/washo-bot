@@ -3,9 +3,12 @@ const Discord = require('discord.js');
 const { users, shop } = require('./db_schema');
 const { prefix, msgExpireTime } = require('./config.json');
 const token = process.env.BOT_TOKEN;
+const { joinVoiceChannel } = require('@discordjs/voice');
 const { Op } = require('sequelize');
 const currency = new Discord.Collection();
-const client = new Discord.Client();
+// [v.0.0.2.5] Added intents to client for the new Discord update
+const { Client, Intents } = require('discord.js');
+const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 const cooldowns = new Discord.Collection();
 client.commands = new Discord.Collection();
@@ -24,7 +27,7 @@ client.once('ready', async () => {
 });
 
 // Every time a message is typed, this procedure starts.
-client.on('message', async message => {
+client.on('messageCreate', async message => {
 
 	if (!message.content.startsWith(prefix) || message.author.bot) return;
 
@@ -97,25 +100,43 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
 
 			// We check either if a user muted/unmuted or deafened/undeafened himself
 			// In that case, we don't want the bot to play the greeting
-			if (oldState.mute != newState.mute || oldState.selfMute != newState.selfMute ||
-				oldState.serverMute != newState.serverMute) {
-				return;
-			}
-			if (oldState.deaf != newState.deaf || oldState.selfDeaf != newState.selfDeaf ||
-				oldState.serverDeaf != newState.serverDeaf) {
-				return;
-			}
 
-			connection = await newState.member.voice.channel.join();
-			voiceChannel = newState.member.voice.channel;
-			if (connection && connection.speaking.bitfield < 1) {
-				const dispatcher = connection.play(fs.createReadStream('resources/melacta.ogg'), { volume: 1 });
-			}
+			// [v0.0.2.5] Commenting this section to check if improves the reactiviness of the greetings
+
+			// if (oldState.mute != newState.mute || oldState.selfMute != newState.selfMute ||
+			// 	oldState.serverMute != newState.serverMute) {
+			// 	return;
+			// }
+			// if (oldState.deaf != newState.deaf || oldState.selfDeaf != newState.selfDeaf ||
+			// 	oldState.serverDeaf != newState.serverDeaf) {
+			// 	return;
+			// }
+
+			// connection = await newState.member.voice.channel.join();
+			// voiceChannel = newState.member.voice.channel;
+
+			joinVoiceChannel({
+				channelId: message.member.voice.channel.id,
+				guildId: message.guild.id,
+				adapterCreator: message.guild.voiceAdapterCreator
+			})
+
+			// [v0.0.2.5] de-commenting this for now
+			const dispatcher = connection.play(fs.createReadStream('resources/melacta.ogg'), { volume: 1 });
+
+			// [v0.0.2.5] commenting this for now
+			// if (connection && connection.speaking.bitfield < 1) {
+			// 	const dispatcher = connection.play(fs.createReadStream('resources/melacta.ogg'), { volume: 1 });
+			// }
+
 		} else if (oldState.member.voice.channel === null && oldState.id != client.user.id) {
-			if (connection && connection.speaking.bitfield < 1) {
-				voiceChannel.join();
-				const dispatcher = connection.play(fs.createReadStream('resources/bye.ogg'), { volume: 1.25 });
-			}
+			// [v0.0.2.5] commenting this for now
+			// if (connection && connection.speaking.bitfield < 1) {
+			// 	voiceChannel.join();
+			// 	const dispatcher = connection.play(fs.createReadStream('resources/bye.ogg'), { volume: 1.25 });
+			// }
+			voiceChannel.join();
+			const dispatcher = connection.play(fs.createReadStream('resources/bye.ogg'), { volume: 1.25 });
 		}
 	} catch (e) { console.error(e) }
 });
