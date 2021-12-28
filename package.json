@@ -8,6 +8,7 @@
     "ffmpeg-static": "^4.4.0",
     "humanize-duration": "^3.27.1",
     "mp3-duration": "^1.1.0",
+    "nodemon": "^2.0.15",
     "random": "^3.0.6",
     "sequelize": "^6.12.2",
     "sqlite3": "^5.0.2",

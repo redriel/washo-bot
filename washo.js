@@ -2,8 +2,9 @@ const fs = require('fs');
 const Discord = require('discord.js');
 const { users, shop } = require('./db_schema');
 const { prefix, msgExpireTime } = require('./config.json');
-//const token = process.env.BOT_TOKEN;
-const token = 'NjY2NjA3MzQ3MTI4NDY3NDc3.Xh2oeA.wEVKI_q5uJYS7SKo1-LDtZUjTO0';
+const { token } = require('./token.json');
+const LOCAL_TOKEN = token;
+const HEROKU_TOKEN = process.env.BOT_TOKEN;
 const { joinVoiceChannel } = require('@discordjs/voice');
 const { Op } = require('sequelize');
 const currency = new Discord.Collection();
@@ -144,4 +145,10 @@ process
 		process.exit(1);
 	});
 
-client.login(token);
+if (typeof HEROKU_TOKEN === 'undefined') {
+	console.log('USING LOCAL TOKEN TO CONNECT');
+	client.login(LOCAL_TOKEN);
+} else {
+	console.log('USING HEROKU ENVIRONMENT TOKEN TO CONNECT');
+	client.login(HEROKU_TOKEN);
+}
