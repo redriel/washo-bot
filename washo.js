@@ -2,7 +2,8 @@ const fs = require('fs');
 const Discord = require('discord.js');
 const { users, shop } = require('./db_schema');
 const { prefix, msgExpireTime } = require('./config.json');
-const token = process.env.BOT_TOKEN;
+//const token = process.env.BOT_TOKEN;
+const token = 'NjY2NjA3MzQ3MTI4NDY3NDc3.Xh2oeA.wEVKI_q5uJYS7SKo1-LDtZUjTO0';
 const { joinVoiceChannel } = require('@discordjs/voice');
 const { Op } = require('sequelize');
 const currency = new Discord.Collection();
@@ -112,20 +113,8 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
 			// 	return;
 			// }
 
-<<<<<<< HEAD
 			connection = await newState.member.voice.channel.join();
 			voiceChannel = newState.member.voice.channel;
-=======
-			// connection = await newState.member.voice.channel.join();
-			// voiceChannel = newState.member.voice.channel;
-
-			joinVoiceChannel({
-				channelId: message.member.voice.channel.id,
-				guildId: message.guild.id,
-				adapterCreator: message.guild.voiceAdapterCreator
-			})
-
->>>>>>> main
 			// [v0.0.2.5] de-commenting this for now
 			const dispatcher = connection.play(fs.createReadStream('resources/melacta.ogg'), { volume: 1 });
 

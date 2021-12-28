@@ -1,24 +1,4 @@
 {
-<<<<<<< HEAD
-    "dependencies": {
-        "@discordjs/opus": "^0.7.0",
-        "discord.io": "https://github.com/woor/discord.io/tarball/gateway_v6",
-        "discord.js": "^13.4.0",
-        "ffmpeg": "0.0.4",
-        "ffmpeg-static": "^4.4.0",
-        "humanize-duration": "^3.27.1",
-        "mp3-duration": "^1.1.0",
-        "random": "^3.0.6",
-        "sequelize": "^6.12.2",
-        "sqlite3": "^5.0.2",
-        "table": "^6.7.5",
-        "winston": "^3.3.3",
-        "ytdl-core": "^4.9.2",
-        "engines": {
-            "node": "16.x"
-          }
-    }
-=======
   "dependencies": {
     "@discordjs/opus": "^0.7.0",
     "@discordjs/voice": "^0.7.5",
@@ -38,5 +18,4 @@
   "engines": {
     "node": "16.13.1"
   }
->>>>>>> main
 }

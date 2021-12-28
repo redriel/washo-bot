@@ -1,9 +1,4 @@
 package-lock.json
 node_modules
-token.json
-<<<<<<< HEAD
-
-*.json
-=======
->>>>>>> main
 .vs/
+token.json
