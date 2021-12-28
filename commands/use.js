@@ -17,7 +17,7 @@ module.exports = {
                     }
                 })
                 .then(msg => {
-                    msg.delete({ timeout: msgExpireTime })
+                    setTimeout(() => msg.delete(), msgExpireTime)
                 })
                 .catch(console.error);
         }
@@ -29,7 +29,9 @@ module.exports = {
                             + `A correct example would be \`.use jukebox coin\``
                     }
                 })
-                .then(msg => { msg.delete({ timeout: msgExpireTime }) })
+                .then(msg => {
+                    setTimeout(() => msg.delete(), msgExpireTime)
+                })
                 .catch(console.error);
         }
         const items = await user.getItems();
@@ -39,19 +41,19 @@ module.exports = {
         if (!items.length) {
             return message.channel.send({ embed: { description: `**${target.username}**, you don't have any belongings!` } })
                 .then(msg => {
-                    msg.delete({ timeout: msgExpireTime })
+                    setTimeout(() => msg.delete(), msgExpireTime)
                 })
                 .catch(console.error);
         } else if (itemSelected == null || itemSelected == undefined) {
             return message.channel.send({ embed: { description: `**${target.username}**, you don't own that item!` } })
                 .then(msg => {
-                    msg.delete({ timeout: msgExpireTime })
+                    setTimeout(() => msg.delete(), msgExpireTime)
                 })
                 .catch(console.error);
         } else {
             return message.channel.send({ embed: { description: `**${itemSelected.item.name}** usage: *${itemSelected.item.description}.*` } })
                 .then(msg => {
-                    msg.delete({ timeout: msgExpireTime })
+                    setTimeout(() => msg.delete(), msgExpireTime)
                 })
                 .catch(console.error);
         }

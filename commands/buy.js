@@ -54,13 +54,15 @@ module.exports = {
             if (Number.isInteger(Number.parseInt(args[0]))) {
                 item = await shop.findOne({ where: { id: { [Op.like]: Number.parseInt(args[0]) } } });
             } else {
-                const itemSelected = args.join(' '); 
+                const itemSelected = args.join(' ');
                 item = await shop.findOne({ where: { name: { [Op.like]: itemSelected } } });
             }
             if (!item) {
                 return message.channel
                     .send({ embed: { description: `The selected item doesn't exist.` } })
-                    .then(msg => { msg.delete({ timeout: msgExpireTime }) })
+                    .then(msg => {
+                        setTimeout(() => msg.delete(), msgExpireTime)
+                    })
                     .catch(console.error);
             }
             if (item.cost > currency.getBalance(target.id)) {
@@ -71,7 +73,9 @@ module.exports = {
                                 `but the ${item.name} costs ${item.cost} ${currencyUnit}`
                         }
                     })
-                    .then(msg => { msg.delete({ timeout: msgExpireTime }) })
+                    .then(msg => {
+                        setTimeout(() => msg.delete(), msgExpireTime)
+                    })
                     .catch(console.error);
             }
             currency.add(target.id, -item.cost);
@@ -84,7 +88,9 @@ module.exports = {
                             `Your current balance is ${currency.getBalance(target.id)} ${currencyUnit}`
                     }
                 })
-                .then(msg => { msg.delete({ timeout: msgExpireTime }) })
+                .then(msg => {
+                    setTimeout(() => msg.delete(), msgExpireTime)
+                })
                 .catch(console.error);
         }
     },

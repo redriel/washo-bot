@@ -10,8 +10,10 @@ module.exports = {
             connection.disconnect();
         } else {
             return message.channel
-                .send(({ embed: { description:`I'm not in the voice channel, I can't stop a shit.`}}))
-                .then(msg => { msg.delete({ timeout: msgExpireTime }) })
+                .send(({ embed: { description: `I'm not in the voice channel, I can't stop a shit.` } }))
+                .then(msg => {
+                    setTimeout(() => msg.delete(), msgExpireTime)
+                })
                 .catch(console.error);
         }
     }

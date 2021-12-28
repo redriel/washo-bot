@@ -46,7 +46,7 @@ module.exports = {
                     }
                 })
                 .then(msg => {
-                    msg.delete({ timeout: msgExpireTime })
+                    setTimeout(() => msg.delete(), msgExpireTime)
                 })
                 .catch(console.error);
         }
@@ -58,7 +58,7 @@ module.exports = {
                     }
                 })
                 .then(msg => {
-                    msg.delete({ timeout: msgExpireTime })
+                    setTimeout(() => msg.delete(), msgExpireTime)
                 })
                 .catch(console.error);
         }

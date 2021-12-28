@@ -21,9 +21,9 @@ module.exports = {
             dispatcher.on('start', () => {
                 message.channel.send({
                     embed: {
-                        description: `Now playing from YouTube  🌐\n`+
-                        `Title: **${song.title}**\n`+
-                        `Duration: **${humanizeDuration(song.length * 1000)}**`
+                        description: `Now playing from YouTube  🌐\n` +
+                            `Title: **${song.title}**\n` +
+                            `Duration: **${humanizeDuration(song.length * 1000)}**`
                     }
                 }).then(msg => {
                     msg.react('⏸️');
@@ -31,7 +31,8 @@ module.exports = {
                     msg.react('⏹️');
                     msg.react('🔉');
                     msg.react('🔊');
-                    msg.delete({ timeout: song.length * 1000 });
+                    setTimeout(() => msg.delete(),  song.length * 1000)
+                    //msg.delete({ timeout: song.length * 1000 });
                     const collector = msg.createReactionCollector(filter, { time: song.length * 1000 });
                     collector.on('collect', r => {
                         switch (r.emoji.name) {
@@ -70,9 +71,9 @@ module.exports = {
         } catch (error) {
             console.error(error);
             return message.channel
-                .send(({ embed: { description:`The URL ${args[0]} is invalid.`}}))
+                .send(({ embed: { description: `The URL ${args[0]} is invalid.` } }))
                 .then(msg => {
-                    msg.delete({ timeout: msgExpireTime });
+                    setTimeout(() => msg.delete(), msgExpireTime)
                 })
                 .catch(console.error);
         }

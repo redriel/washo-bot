@@ -19,9 +19,9 @@ module.exports = {
         });
         const output = table(data);
         return message.channel
-            .send(`${output}`, {split: true, code: true})
+            .send(`${output}`, { split: true, code: true })
             .then(msg => {
-                msg.delete({ timeout: msgExpireTime })
+                setTimeout(() => msg.delete(), msgExpireTime)
             })
             .catch(console.error);
     },

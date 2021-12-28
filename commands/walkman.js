@@ -63,7 +63,9 @@ module.exports = {
         } else {
             return message.channel
                 .send(({ embed: { description: `No one is listening, and I'm feeling lazy.` } }))
-                .then(msg => { msg.delete({ timeout: mp3FileDuration }) })
+                .then(msg => {
+                    setTimeout(() => msg.delete(), mp3FileDuration)
+                })
                 .catch(console.error);
         }
     },

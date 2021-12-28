@@ -23,7 +23,7 @@ module.exports = {
                     }
                 })
                 .then(msg => {
-                    msg.delete({ timeout: msgExpireTime })
+                    setTimeout(() => msg.delete(), msgExpireTime)
                 })
                 .catch(console.error);
         }
@@ -56,7 +56,8 @@ module.exports = {
                     msg.react('⏹️');
                     msg.react('🔉');
                     msg.react('🔊');
-                    msg.delete({ timeout: mp3FileDuration + 1000 });
+                    setTimeout(() => msg.delete(), mp3FileDuration + 1000);
+                    //msg.delete({ timeout: mp3FileDuration + 1000 });
                     const collector = msg.createReactionCollector(filter, { time: mp3FileDuration });
                     collector.on('collect', r => {
                         switch (r.emoji.name) {
@@ -95,7 +96,9 @@ module.exports = {
         } else {
             return message.channel
                 .send(({ embed: { description: `No one is listening, and I'm feeling lazy.` } }))
-                .then(msg => { msg.delete({ timeout: mp3FileDuration }) })
+                .then(msg => {
+                    setTimeout(() => msg.delete(), mp3FileDuration)
+                })
                 .catch(console.error);
         }
     },

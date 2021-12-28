@@ -96,13 +96,17 @@ async function coinflip(message, target, args) {
                         + `A correct example would be \`.bet[b] head\\tail[h\\t] 10\``
                 }
             })
-            .then(msg => { msg.delete({ timeout: msgExpireTime }) })
+            .then(msg => {
+                setTimeout(() => msg.delete(), msgExpireTime)
+            })
             .catch(console.error);
     }
     if (Number.isNaN(wager) || !Number.isInteger(wager) || wager > currentBalance || wager <= 0) {
         return message.channel
             .send({ embed: { description: `Sorry **${target.username}**, that is an invalid amount of ${currencyUnit}` } })
-            .then(msg => { msg.delete({ timeout: msgExpireTime }) })
+            .then(msg => {
+                setTimeout(() => msg.delete(), msgExpireTime)
+            })
             .catch(console.error);
     }
     await currency.add(target.id, -wager);
@@ -120,7 +124,9 @@ async function coinflip(message, target, args) {
                         `Your current balance is **${currency.getBalance(target.id)}** ${currencyUnit}`
                 }
             })
-            .then(msg => { msg.delete({ timeout: msgExpireTime }) })
+            .then(msg => {
+                setTimeout(() => msg.delete(), msgExpireTime)
+            })
             .catch(console.error);
     } else {
         return message.channel
@@ -132,7 +138,9 @@ async function coinflip(message, target, args) {
                         `Your current balance is **${currency.getBalance(target.id)}** ${currencyUnit}`
                 }
             })
-            .then(msg => { msg.delete({ timeout: msgExpireTime }) })
+            .then(msg => {
+                setTimeout(() => msg.delete(), msgExpireTime)
+            })
             .catch(console.error);
     }
 }
@@ -145,7 +153,9 @@ async function rolldice(message, target, args) {
     if (Number.isNaN(wager) || !Number.isInteger(wager) || wager > currentBalance || wager <= 0) {
         return message.channel
             .send({ embed: { description: `Sorry **${target.username}**, that is an invalid amount of ${currencyUnit}` } })
-            .then(msg => { msg.delete({ timeout: msgExpireTime }) })
+            .then(msg => {
+                setTimeout(() => msg.delete(), msgExpireTime)
+            })
             .catch(console.error);
     }
     await currency.add(target.id, -wager);
@@ -176,7 +186,9 @@ async function rolldice(message, target, args) {
                         `Your current balance is **${currency.getBalance(target.id)}** ${currencyUnit}`
                 }
             })
-            .then(msg => { msg.delete({ timeout: msgExpireTime }) })
+            .then(msg => {
+                setTimeout(() => msg.delete(), msgExpireTime)
+            })
             .catch(console.error);
     } else if ([5, 6].indexOf(result) > -1) {
         return message.channel
@@ -187,7 +199,9 @@ async function rolldice(message, target, args) {
                         `Your current balance is **${currency.getBalance(target.id)}** ${currencyUnit}`
                 }
             })
-            .then(msg => { msg.delete({ timeout: msgExpireTime }) })
+            .then(msg => {
+                setTimeout(() => msg.delete(), msgExpireTime)
+            })
             .catch(console.error);
     } else {
         return message.channel
@@ -198,7 +212,9 @@ async function rolldice(message, target, args) {
                         `Your current balance is **${currency.getBalance(target.id)}** ${currencyUnit}`
                 }
             })
-            .then(msg => { msg.delete({ timeout: msgExpireTime }) })
+            .then(msg => {
+                setTimeout(() => msg.delete(), msgExpireTime)
+            })
             .catch(console.error);
     }
 }

@@ -48,7 +48,7 @@ module.exports = {
                     }
                 })
                 .then(msg => {
-                    msg.delete({ timeout: msgExpireTime })
+                    setTimeout(() => msg.delete(), msgExpireTime)
                 })
                 .catch(console.error);
         }
@@ -62,7 +62,7 @@ module.exports = {
                     }
                 })
                 .then(msg => {
-                    msg.delete({ timeout: msgExpireTime })
+                    setTimeout(() => msg.delete(), msgExpireTime)
                 })
                 .catch(console.error);
         }
@@ -75,7 +75,7 @@ module.exports = {
             return message.channel
                 .send({ embed: { description: `Sorry ${giver.username}, you only have ${giverBalance} ${currencyUnit}` } })
                 .then(msg => {
-                    msg.delete({ timeout: msgExpireTime })
+                    setTimeout(() => msg.delete(), msgExpireTime)
                 })
                 .catch(console.error);
         }
@@ -83,7 +83,7 @@ module.exports = {
             return message.channel
                 .send({ embed: { description: `Please ${giver.username}, insert an amount greater than 0 of ${currencyUnit}` } })
                 .then(msg => {
-                    msg.delete({ timeout: msgExpireTime })
+                    setTimeout(() => msg.delete(), msgExpireTime)
                 })
                 .catch(console.error);
         }
@@ -93,12 +93,12 @@ module.exports = {
         await currency.add(receiver.id, +donation);
 
         return message.channel
-            .send({ 
-                embed: { 
-                    description: `**${giver.username}** ➡️ **${donation}** ${currencyUnit} ➡️ **${receiver.username}**\n`+ 
-                    `Transaction completed! 🥳🥳🥳\n` + 
-                    `**${giver.username}** current balance: **${currency.getBalance(giver.id)}** ${currencyUnit}\n` +
-                    `**${receiver.username}** current balance: **${currency.getBalance(receiver.id)}** ${currencyUnit}`
+            .send({
+                embed: {
+                    description: `**${giver.username}** ➡️ **${donation}** ${currencyUnit} ➡️ **${receiver.username}**\n` +
+                        `Transaction completed! 🥳🥳🥳\n` +
+                        `**${giver.username}** current balance: **${currency.getBalance(giver.id)}** ${currencyUnit}\n` +
+                        `**${receiver.username}** current balance: **${currency.getBalance(receiver.id)}** ${currencyUnit}`
                 }
             })
             .then(msg => {

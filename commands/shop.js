@@ -12,7 +12,7 @@ module.exports = {
         if (items == null || items == undefined) {
             return message.channel.send({ embed: { description: `Apparently, there are no items in the shop. Must be thieves.` } })
                 .then(msg => {
-                    msg.delete({ timeout: msgExpireTime })
+                    setTimeout(() => msg.delete(), msgExpireTime)
                 })
                 .catch(console.error);
         } else {
@@ -24,9 +24,9 @@ module.exports = {
             });
             const output = table(data);
             return message.channel
-                .send(`${output}`, {code: true})
+                .send(`${output}`, { code: true })
                 .then(msg => {
-                    msg.delete({ timeout: msgExpireTime })
+                    setTimeout(() => msg.delete(), msgExpireTime)
                 })
                 .catch(console.error);
         }

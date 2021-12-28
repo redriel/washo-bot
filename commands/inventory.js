@@ -39,7 +39,7 @@ module.exports = {
                     }
                 })
                 .then(msg => {
-                    msg.delete({ timeout: msgExpireTime })
+                    setTimeout(() => msg.delete(), msgExpireTime)
                 })
                 .catch(console.error);
         }
@@ -47,7 +47,7 @@ module.exports = {
         if (!items.length) {
             return message.channel.send({ embed: { description: `**${target.username}**, you don't have any belongings!` } })
                 .then(msg => {
-                    msg.delete({ timeout: msgExpireTime })
+                    setTimeout(() => msg.delete(), msgExpireTime)
                 })
                 .catch(console.error);
         } else {
@@ -64,7 +64,7 @@ module.exports = {
                     .catch(console.error);
             } else return message.channel.send({ embed: { description: `**${target.username}**, you don't have any belongings!` } })
                 .then(msg => {
-                    msg.delete({ timeout: msgExpireTime })
+                    setTimeout(() => msg.delete(), msgExpireTime)
                 })
                 .catch(console.error);
         }
