@@ -40,13 +40,13 @@ module.exports = {
         if (!user) {
             return message.channel
                 .send({
-                    embed: {
+                    embeds: [{
                         description: `**${target.username}**, you are not registered.\n` +
                             `Please insert the command \`.register\``
-                    }
+                    }]
                 })
                 .then(msg => {
-                    msg.delete({ timeout: msgExpireTime })
+                    setTimeout(() => msg.delete(), msgExpireTime)
                 })
                 .catch(console.error);
         } else {
@@ -59,7 +59,11 @@ module.exports = {
             }
             if (!item) {
                 return message.channel
-                    .send({ embed: { description: `The selected item doesn't exist.` } })
+                    .send({
+                        embeds: [{
+                            description: `The selected item doesn't exist.`
+                        }]
+                    })
                     .then(msg => {
                         setTimeout(() => msg.delete(), msgExpireTime)
                     })
@@ -68,10 +72,10 @@ module.exports = {
             if (item.cost > currency.getBalance(target.id)) {
                 return message.channel
                     .send({
-                        embed: {
+                        embeds: [{
                             description: `You currently have ${currency.getBalance(target.id)} ${currencyUnit}, ` +
                                 `but the ${item.name} costs ${item.cost} ${currencyUnit}`
-                        }
+                        }]
                     })
                     .then(msg => {
                         setTimeout(() => msg.delete(), msgExpireTime)
@@ -83,10 +87,10 @@ module.exports = {
 
             message.channel
                 .send({
-                    embed: {
+                    embeds: [{
                         description: `Congratulation, you bought **${item.name}**!\n` +
                             `Your current balance is ${currency.getBalance(target.id)} ${currencyUnit}`
-                    }
+                    }]
                 })
                 .then(msg => {
                     setTimeout(() => msg.delete(), msgExpireTime)

@@ -24,19 +24,19 @@ module.exports = {
         const user = await users.findOne({ where: { user_id: target.id } });
         if (user) {
             await loadBalance(target.id);
-            return message.channel.send(({ embed: { description: `**${target.username}**, you have ${currency.getBalance(target.id)} ${currencyUnit}` } }))
+            return message.channel.send({ embeds: [{ description: `**${target.username}**, you have ${currency.getBalance(target.id)} ${currencyUnit}` }] })
                 .then(msg => {
                     setTimeout(() => msg.delete(), msgExpireTime)
                 })
                 .catch(console.error);
         } else {
             return message.channel
-                .send(({
-                    embed: {
+                .send({
+                    embeds: [{
                         description: `**${target.username}**, you are not registered.\n` +
                             `Please insert the command \`.register\``
-                    }
-                }))
+                    }]
+                })
                 .then(msg => {
                     setTimeout(() => msg.delete(), msgExpireTime)
                 })

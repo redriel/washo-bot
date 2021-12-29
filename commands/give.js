@@ -42,10 +42,10 @@ module.exports = {
         if (giverUser == null || giverUser == undefined || receiver == null || receiverUser == undefined) {
             return message.channel
                 .send({
-                    embed: {
+                    embeds: [{
                         description: `**${giver.username}**, either you or the receiver of the donation are not registered.\n` +
                             `To register, please insert the command \`.register\``
-                    }
+                    }]
                 })
                 .then(msg => {
                     setTimeout(() => msg.delete(), msgExpireTime)
@@ -56,10 +56,10 @@ module.exports = {
         if (!Number.isInteger(args[1])) {
             return message.channel
                 .send({
-                    embed: {
+                    embeds: [{
                         description: `**${giver.username}**, your command syntax is incorrect.\n` +
                             `A correct example would be: \`.give @user 10\``
-                    }
+                    }]
                 })
                 .then(msg => {
                     setTimeout(() => msg.delete(), msgExpireTime)
@@ -73,7 +73,11 @@ module.exports = {
 
         if (donation > giverBalance) {
             return message.channel
-                .send({ embed: { description: `Sorry ${giver.username}, you only have ${giverBalance} ${currencyUnit}` } })
+                .send({
+                    embeds: [{
+                        description: `Sorry ${giver.username}, you only have ${giverBalance} ${currencyUnit}`
+                    }]
+                })
                 .then(msg => {
                     setTimeout(() => msg.delete(), msgExpireTime)
                 })
@@ -81,7 +85,11 @@ module.exports = {
         }
         if (donation <= 0) {
             return message.channel
-                .send({ embed: { description: `Please ${giver.username}, insert an amount greater than 0 of ${currencyUnit}` } })
+                .send({
+                    embeds: [{
+                        description: `Please ${giver.username}, insert an amount greater than 0 of ${currencyUnit}`
+                    }]
+                })
                 .then(msg => {
                     setTimeout(() => msg.delete(), msgExpireTime)
                 })
@@ -94,15 +102,15 @@ module.exports = {
 
         return message.channel
             .send({
-                embed: {
+                embeds: [{
                     description: `**${giver.username}** ➡️ **${donation}** ${currencyUnit} ➡️ **${receiver.username}**\n` +
                         `Transaction completed! 🥳🥳🥳\n` +
                         `**${giver.username}** current balance: **${currency.getBalance(giver.id)}** ${currencyUnit}\n` +
                         `**${receiver.username}** current balance: **${currency.getBalance(receiver.id)}** ${currencyUnit}`
-                }
+                }]
             })
             .then(msg => {
-                msg.delete({ timeout: msgExpireTime })
+                setTimeout(() => msg.delete(), msgExpireTime)
             })
             .catch(console.error);
     },

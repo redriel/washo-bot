@@ -42,13 +42,13 @@ module.exports = {
         if (user == null || user == undefined) {
             return message.channel
                 .send({
-                    embed: {
+                    embeds: [{
                         description: `**${target.username}**, you are not registered.\n` +
                             `Please insert the command \`.register\``
-                    }
+                    }]
                 })
                 .then(msg => {
-                    msg.delete({ timeout: msgExpireTime })
+                    setTimeout(() => msg.delete(), msgExpireTime)
                 })
                 .catch(console.error);
         }
@@ -69,15 +69,15 @@ module.exports = {
         } else {
             return message.channel
                 .send({
-                    embed: {
+                    embeds: [{
                         description: `**${target.username}**, please insert an amount of ${currencyUnit} ` +
                             `you desire to bet after selecting a game\n` +
                             `**Example:** \`.bet rolldice 10\`\n` +
                             `If you want more info about game, please insert the command \`.list games\``
-                    }
+                    }]
                 })
                 .then(msg => {
-                    msg.delete({ timeout: msgExpireTime })
+                    setTimeout(() => msg.delete(), msgExpireTime)
                 })
                 .catch(console.error);
         }
@@ -91,10 +91,10 @@ async function coinflip(message, target, args) {
     if (coinSide == null || coinSide == undefined || ['head', 'h', 'tail', 't'].indexOf(coinSide) < 0) {
         return message.channel
             .send({
-                embed: {
+                embeds: [{
                     description: `Sorry **${target.username}**, the syntax of your command is invalid.\n`
                         + `A correct example would be \`.bet[b] head\\tail[h\\t] 10\``
-                }
+                }]
             })
             .then(msg => {
                 setTimeout(() => msg.delete(), msgExpireTime)
@@ -103,7 +103,11 @@ async function coinflip(message, target, args) {
     }
     if (Number.isNaN(wager) || !Number.isInteger(wager) || wager > currentBalance || wager <= 0) {
         return message.channel
-            .send({ embed: { description: `Sorry **${target.username}**, that is an invalid amount of ${currencyUnit}` } })
+            .send({
+                embeds: [{
+                    description: `Sorry **${target.username}**, that is an invalid amount of ${currencyUnit}`
+                }]
+            })
             .then(msg => {
                 setTimeout(() => msg.delete(), msgExpireTime)
             })
@@ -117,12 +121,12 @@ async function coinflip(message, target, args) {
         await currency.add(target.id, 2 * wager);
         return message.channel
             .send({
-                embed: {
+                embeds: [{
                     description: `You bet **${wager}** ${currencyUnit}\n` +
                         `It landed **${headOrTail}** ${headOrTail == 'head' ? `👤` : `🔘`}!\n` +
                         `**${target.username}**, you won **${2 * wager}** ${currencyUnit}!\n` +
                         `Your current balance is **${currency.getBalance(target.id)}** ${currencyUnit}`
-                }
+                }]
             })
             .then(msg => {
                 setTimeout(() => msg.delete(), msgExpireTime)
@@ -131,12 +135,12 @@ async function coinflip(message, target, args) {
     } else {
         return message.channel
             .send({
-                embed: {
+                embeds: [{
                     description: `You bet **${wager}** ${currencyUnit}\n` +
                         `It landed **${headOrTail}** ${headOrTail == 'head' ? `👤` : `🔘`}!\n` +
                         `Sorry **${target.username}**, you lost **${wager}** ${currencyUnit}!\n` +
                         `Your current balance is **${currency.getBalance(target.id)}** ${currencyUnit}`
-                }
+                }]
             })
             .then(msg => {
                 setTimeout(() => msg.delete(), msgExpireTime)
@@ -152,7 +156,11 @@ async function rolldice(message, target, args) {
     const currentBalance = currency.getBalance(target.id);
     if (Number.isNaN(wager) || !Number.isInteger(wager) || wager > currentBalance || wager <= 0) {
         return message.channel
-            .send({ embed: { description: `Sorry **${target.username}**, that is an invalid amount of ${currencyUnit}` } })
+            .send({
+                embeds: [{
+                    description: `Sorry **${target.username}**, that is an invalid amount of ${currencyUnit}`
+                }]
+            })
             .then(msg => {
                 setTimeout(() => msg.delete(), msgExpireTime)
             })
@@ -180,11 +188,11 @@ async function rolldice(message, target, args) {
     if ([1, 2, 3].indexOf(result) > -1) {
         return message.channel
             .send({
-                embed: {
+                embeds: [{
                     description: `You bet **${wager}** ${currencyUnit}\nIt's a **${result}** 🎲!\n` +
                         `Sorry **${target.username}**, you lost.\n` +
                         `Your current balance is **${currency.getBalance(target.id)}** ${currencyUnit}`
-                }
+                }]
             })
             .then(msg => {
                 setTimeout(() => msg.delete(), msgExpireTime)
@@ -193,11 +201,11 @@ async function rolldice(message, target, args) {
     } else if ([5, 6].indexOf(result) > -1) {
         return message.channel
             .send({
-                embed: {
+                embeds: [{
                     description: `You bet **${wager}** ${currencyUnit}\n` +
                         `It's a **${result}** 🎲!\nWow **${target.username}**, you won ${winning} ${currencyUnit}!\n` +
                         `Your current balance is **${currency.getBalance(target.id)}** ${currencyUnit}`
-                }
+                }]
             })
             .then(msg => {
                 setTimeout(() => msg.delete(), msgExpireTime)
@@ -206,11 +214,11 @@ async function rolldice(message, target, args) {
     } else {
         return message.channel
             .send({
-                embed: {
+                embeds: [{
                     description: `You bet **${wager}** ${currencyUnit}\n` +
                         `It's a **${result}** 🎲!\nWell **${target.username}**, you won back your ${winning} ${currencyUnit}!\n` +
                         `Your current balance is **${currency.getBalance(target.id)}** ${currencyUnit}`
-                }
+                }]
             })
             .then(msg => {
                 setTimeout(() => msg.delete(), msgExpireTime)

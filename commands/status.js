@@ -16,6 +16,12 @@ module.exports = {
             .addField('Author', `\`${author}\``)
             .setFooter('https://github.com/redriel/washo-bot');
 
-        message.channel.send({ embed: botInfoEmbed });
+        message.channel
+        .send({
+            embeds: [{
+                description: botInfoEmbed
+            }]
+        })
+        //.send({ embed: botInfoEmbed });
     },
 };

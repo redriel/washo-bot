@@ -33,10 +33,10 @@ module.exports = {
         if (user == null || user == undefined) {
             return message.channel
                 .send({
-                    embed: {
+                    embeds: [{
                         description: `**${target.username}**, you are not registered.\n` +
                             `Please insert the command \`.register\``
-                    }
+                    }]
                 })
                 .then(msg => {
                     setTimeout(() => msg.delete(), msgExpireTime)
@@ -45,21 +45,24 @@ module.exports = {
         }
         const items = await user.getItems();
         if (!items.length) {
-            return message.channel.send({ embed: { description: `**${target.username}**, you don't have any belongings!` } })
-                .then(msg => {
-                    setTimeout(() => msg.delete(), msgExpireTime)
+            return message.channel
+                .send({
+                    embeds: [{
+                        description: `**${target.username}**, you don't have any belongings!`
+                    }]
                 })
                 .catch(console.error);
         } else {
             if (items.filter(i => i.amount > 0).length > 0) {
-                return message.channel.send(({
-                    embed: {
-                        description: `${target.username} currently has: \n` +
-                            ` - ${items.filter(i => i.amount > 0).map(i => `${i.amount} ${i.item.name}${i.amount > 1 ? `s` : ``}`).join('\n')}`
-                    }
-                }))
+                return message.channel
+                    .send({
+                        embeds: [{
+                            description: `${target.username} currently has: \n` +
+                                ` - ${items.filter(i => i.amount > 0).map(i => `${i.amount} ${i.item.name}${i.amount > 1 ? `s` : ``}`).join('\n')}`
+                        }]
+                    })
                     .then(msg => {
-                        msg.delete({ timeout: msgExpireTime })
+                        setTimeout(() => msg.delete(), msgExpireTime)
                     })
                     .catch(console.error);
             } else return message.channel.send({ embed: { description: `**${target.username}**, you don't have any belongings!` } })

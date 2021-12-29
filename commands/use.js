@@ -11,10 +11,10 @@ module.exports = {
         if (user == null || user == undefined) {
             return message.channel
                 .send({
-                    embed: {
+                    embeds: [{
                         description: `**${target.username}**, you are not registered.\n` +
                             `Please insert the command \`.register\``
-                    }
+                    }]
                 })
                 .then(msg => {
                     setTimeout(() => msg.delete(), msgExpireTime)
@@ -24,10 +24,10 @@ module.exports = {
         if (args.length == 0) {
             return message.channel
                 .send({
-                    embed: {
+                    embeds: [{
                         description: `Sorry **${target.username}**, the syntax of your command is invalid.\n`
                             + `A correct example would be \`.use jukebox coin\``
-                    }
+                    }]
                 })
                 .then(msg => {
                     setTimeout(() => msg.delete(), msgExpireTime)
@@ -39,19 +39,34 @@ module.exports = {
         const itemSelected = await items.filter(i => i.item.name == itemName)[0];
 
         if (!items.length) {
-            return message.channel.send({ embed: { description: `**${target.username}**, you don't have any belongings!` } })
+            return message.channel
+                .send({
+                    embeds: [{
+                        description: `**${target.username}**, you don't have any belongings!`
+                    }]
+                })
                 .then(msg => {
                     setTimeout(() => msg.delete(), msgExpireTime)
                 })
                 .catch(console.error);
         } else if (itemSelected == null || itemSelected == undefined) {
-            return message.channel.send({ embed: { description: `**${target.username}**, you don't own that item!` } })
+            return message.channel
+                .send({
+                    embeds: [{
+                        description: `**${target.username}**, you don't own that item!`
+                    }]
+                })
                 .then(msg => {
                     setTimeout(() => msg.delete(), msgExpireTime)
                 })
                 .catch(console.error);
         } else {
-            return message.channel.send({ embed: { description: `**${itemSelected.item.name}** usage: *${itemSelected.item.description}.*` } })
+            return message.channel
+                .send({
+                    embeds: [{
+                        description: `**${itemSelected.item.name}** usage: *${itemSelected.item.description}.*`
+                    }]
+                })
                 .then(msg => {
                     setTimeout(() => msg.delete(), msgExpireTime)
                 })

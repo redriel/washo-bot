@@ -1,3 +1,21 @@
+/**
+ * This is a JavaScript Discord BOT application.
+ * It is built with the Discord.js (v13) framework. 
+ * The washo.js file is the entry point of the application.
+ * To run it locally launch the command 'node washo.js' or
+ * 'nodemon washo.js' if you wish to autorestart on every edit.
+ * 
+ * 
+ * @date 2021/12/29
+ * @author redriel
+ * @version  0.1.0.1
+ */
+
+//TODO: fix status and info embeds (rename info in help and status in version maybe?)
+//TODO fix shop and leaderboard embeds
+//TODO: update the usage of embeds
+//TODO: update the connection to the voice channel
+
 const fs = require('fs');
 const Discord = require('discord.js');
 const { users, shop } = require('./db_schema');
@@ -23,7 +41,7 @@ for (const file of commandFiles) {
 
 // Console log reports the successful log in.
 client.once('ready', async () => {
-	console.log(`Logged in as ${client.user.tag}!`);
+	console.log(`${client.user.tag} is up and running.`);
 	const storedBalances = await users.findAll();
 	storedBalances.forEach(b => currency.set(b.user_id, b));
 });
@@ -44,7 +62,9 @@ client.on('messageCreate', async message => {
 	if (command.guildOnly && message.channel.type !== 'text') {
 		return message
 			.reply('I can\'t execute that command inside DMs!')
-			.then(msg => { msg.delete({ timeout: msgExpireTime }) })
+			.then(msg => {
+				setTimeout(() => msg.delete(), msgExpireTime)
+			})
 			.catch(console.error);
 	}
 
@@ -55,7 +75,9 @@ client.on('messageCreate', async message => {
 		}
 		return message.channel
 			.send({ embed: { description: reply } })
-			.then(msg => { msg.delete({ timeout: msgExpireTime }) })
+			.then(msg => {
+				setTimeout(() => msg.delete(), msgExpireTime)
+			})
 			.catch(console.error);
 	}
 
@@ -73,7 +95,9 @@ client.on('messageCreate', async message => {
 		if (now < expirationTime) {
 			const timeLeft = (expirationTime - now) / 1000;
 			return message.reply(`please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`)
-				.then(msg => { msg.delete({ timeout: msgExpireTime }) })
+				.then(msg => {
+					setTimeout(() => msg.delete(), msgExpireTime)
+				})
 				.catch(console.error);
 		}
 	}
@@ -89,7 +113,9 @@ client.on('messageCreate', async message => {
 	} catch (error) {
 		console.error(error);
 		message.reply(`There was an error trying to execute the command \`${commandName}\`!`)
-			.then(msg => { msg.delete({ timeout: msgExpireTime }) })
+			.then(msg => {
+				setTimeout(() => msg.delete(), msgExpireTime)
+			})
 			.catch(console.error);
 	}
 
