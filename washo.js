@@ -11,7 +11,6 @@
  * @version  0.1.0.1
  */
 
-//TODO: fix status and info embeds (rename info in help and status in version maybe?)
 //TODO fix shop and leaderboard embeds
 //TODO: update the usage of embeds
 //TODO: update the connection to the voice channel

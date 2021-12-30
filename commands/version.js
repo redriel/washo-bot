@@ -1,9 +1,9 @@
-const { name, version, description, author } = require('./../config.json');
+const { name, version, description, author, msgExpireTime } = require('../config.json');
 const Discord = require('discord.js');
 
 module.exports = {
-    name: 'status',
-    aliases: ['version', 'washo'],
+    name: 'version',
+    aliases: ['v', 'status', 'washo'],
     description: 'Tell everything about the bot',
     execute(message, args) {
 
@@ -18,10 +18,11 @@ module.exports = {
 
         message.channel
         .send({
-            embeds: [{
-                description: botInfoEmbed
-            }]
+            embeds: [botInfoEmbed]
         })
-        //.send({ embed: botInfoEmbed });
+        .then(msg => {
+            setTimeout(() => msg.delete(), msgExpireTime)
+        })
+        .catch(console.error);
     },
 };

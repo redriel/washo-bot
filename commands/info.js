@@ -4,6 +4,10 @@ const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('
 const Discord = require('discord.js');
 commands = new Discord.Collection();
 const { table } = require('table');
+const customSplitMessage = (text) => [
+    text.substring(0, 2000),
+    text.substring(2000, text.length),
+  ];
 
 module.exports = {
     name: 'info',
@@ -19,7 +23,15 @@ module.exports = {
         });
         const output = table(data);
         return message.channel
-            .send(`${output}`, { split: true, code: true })
+            //.send(`${output}`, { split: true, code: true })
+            .send({
+                embeds: [{
+                    description: customSplitMessage(`${output}`.repeat(501))[0]
+                }]
+            })
+            // .send({
+            //     content: customSplitMessage(`${output}`.repeat(501))[0],
+            //   })
             .then(msg => {
                 setTimeout(() => msg.delete(), msgExpireTime)
             })
