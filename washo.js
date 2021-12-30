@@ -126,24 +126,24 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
 			newState.member.voice.member) {
 
 			const connection = joinVoiceChannel({
-                channelId: newState.member.voice.channelId,
-                guildId: newState.member.voice.channel.guildId,
-                adapterCreator:  newState.member.voice.channel.guild.voiceAdapterCreator,
-            });
+				channelId: newState.member.voice.channelId,
+				guildId: newState.member.voice.channel.guildId,
+				adapterCreator: newState.member.voice.channel.guild.voiceAdapterCreator,
+			});
 			const audioPlayer = createAudioPlayer();
 			const resource = createAudioResource(createReadStream(join(__dirname, 'resources/melacta.ogg')), {
-                inlineVolume : true
-            });
+				inlineVolume: true
+			});
 			resource.volume.setVolume(1);
 			connection.subscribe(audioPlayer);
 			audioPlayer.play(resource);
-			
+
 		} else if (oldState.member.voice.channel === null && oldState.id != client.user.id) {
 
 			const audioPlayer = createAudioPlayer();
 			const resource = createAudioResource(createReadStream(join(__dirname, 'resources/bye.ogg')), {
-                inlineVolume : true
-            });
+				inlineVolume: true
+			});
 			resource.volume.setVolume(1.5);
 			connection.subscribe(audioPlayer);
 			audioPlayer.play(resource);
