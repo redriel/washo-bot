@@ -12,7 +12,6 @@
  */
 
 //TODO fix shop and leaderboard embeds
-//TODO: update the connection to the voice channel
 
 const fs = require('fs');
 const { createReadStream } = require('fs');
@@ -126,7 +125,7 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
 		if (newState.member.voice.channel && newState.id != client.user.id &&
 			newState.member.voice.member) {
 
-			connection = joinVoiceChannel({
+			const connection = joinVoiceChannel({
                 channelId: newState.member.voice.channelId,
                 guildId: newState.member.voice.channel.guildId,
                 adapterCreator:  newState.member.voice.channel.guild.voiceAdapterCreator,
@@ -148,7 +147,7 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
 			resource.volume.setVolume(1.5);
 			connection.subscribe(audioPlayer);
 			audioPlayer.play(resource);
-			
+
 		}
 	} catch (e) { console.error(e) }
 });
