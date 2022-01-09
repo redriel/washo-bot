@@ -1,3 +1,4 @@
+const { joinVoiceChannel } = require('@discordjs/voice');
 const { msgExpireTime } = require('./../config.json');
 
 module.exports = {
@@ -6,12 +7,22 @@ module.exports = {
     description: 'Stops any music transmission',
     async execute(message, args) {
         if (message.member.voice.channel) {
-            const connection = await message.member.voice.channel.join();
+            const connection = joinVoiceChannel({
+                channelId: message.member.voice.channelId,
+                guildId: message.member.voice.channel.guildId,
+                adapterCreator:  message.member.voice.channel.guild.voiceAdapterCreator,
+            });
             connection.disconnect();
         } else {
             return message.channel
-                .send(({ embed: { description:`I'm not in the voice channel, I can't stop a shit.`}}))
-                .then(msg => { msg.delete({ timeout: msgExpireTime }) })
+                .send({
+                    embeds: [{
+                        description: `I'm not in the voice channel, I can't stop a shit.`
+                    }]
+                })
+                .then(msg => {
+                    setTimeout(() => msg.delete(), msgExpireTime)
+                })
                 .catch(console.error);
         }
     }

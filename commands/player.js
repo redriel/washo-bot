@@ -1,85 +1,120 @@
 const ytdl = require('ytdl-core');
 const humanizeDuration = require('humanize-duration');
 const { msgExpireTime, defaultPlayerVolume } = require('./../config.json');
+const { joinVoiceChannel, createAudioPlayer, createAudioResource, StreamType, generateDependencyReport } = require('@discordjs/voice');
+const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js');
+const wait = require('util').promisify(setTimeout);
 let currentVolume = defaultPlayerVolume;
 
 module.exports = {
     name: 'youtube',
-    aliases: ['y', 'play', 'p'],
+    aliases: ['y', 'play', 'p', 'player'],
     description: 'Play music from youtube',
     async execute(message, args) {
         try {
-            const connection = await message.member.voice.channel.join();
-
-            joinVoiceChannel({
-                channelId: message.member.voice.channel.id,
-                guildId: message.guild.id,
-                adapterCreator: message.guild.voiceAdapterCreator
-            })
-
-            const dispatcher = joinVoiceChannel.play(await ytdl(args[0]), { opusEncoded: true, volume: 0.5 });
+            const connection = joinVoiceChannel({
+                channelId: message.member.voice.channelId,
+                guildId: message.member.voice.channel.guildId,
+                adapterCreator: message.member.voice.channel.guild.voiceAdapterCreator,
+            });
             const songInfo = await ytdl.getInfo(args[0]);
             const song = {
                 title: songInfo.videoDetails.title,
                 url: songInfo.videoDetails.video_url,
-                length: songInfo.videoDetails.lengthSeconds
+                length: songInfo.videoDetails.lengthSeconds,
+                thumbnail: songInfo.videoDetails.thumbnails[3]
             };
-            const filter = (reaction, user) => ['⏸️', '▶️', '⏹️', '🔉', '🔊'].indexOf(reaction.emoji.name) > -1 && !user.bot;
-            dispatcher.on('start', () => {
-                message.channel.send({
-                    embed: {
-                        description: `Now playing from YouTube  🌐\n`+
-                        `Title: **${song.title}**\n`+
-                        `Duration: **${humanizeDuration(song.length * 1000)}**`
+            const stream = ytdl(song.url, {
+                filter: 'audioonly',
+                highWaterMark: 1 << 25,
+            });
+            const player = createAudioPlayer();
+            const resource = createAudioResource(stream, {
+                inlineVolume: true
+            });
+            resource.volume.setVolume(currentVolume);
+            connection.subscribe(player);
+            player.play(resource);
+            const row = new MessageActionRow()
+                .addComponents(
+                    new MessageButton()
+                        .setCustomId('pause')
+                        .setLabel('PAUSE')
+                        .setStyle('PRIMARY'),
+                    new MessageButton()
+                        .setCustomId('voldown')
+                        .setLabel('VOL -')
+                        .setStyle('SECONDARY'),
+                    new MessageButton()
+                        .setCustomId('volup')
+                        .setLabel('VOL +')
+                        .setStyle('SECONDARY'),
+                    new MessageButton()
+                        .setCustomId('stop')
+                        .setLabel('STOP')
+                        .setStyle('DANGER')
+                );
+            const embed = new MessageEmbed()
+                .setDescription(`Now playing from YouTube\n` +
+                    `Title: **${song.title}**\n` +
+                    `Duration: **${humanizeDuration(song.length * 1000)}**\n`)
+                .setImage(song.thumbnail.url)
+
+            message.channel
+                .send({
+                    embeds: [embed],
+                    components: [row]
+                })
+                .then(msg => {
+                    setTimeout(() => msg.delete(), song.length * 1000)
+                })
+                .catch(console.error);
+
+            const filter = i => i.customId === 'pause' || i.customId === 'voldown' || i.customId === 'volup' || i.customId === 'stop';
+            const collector = message.channel.createMessageComponentCollector({ filter, time: song.length * 1000 });
+
+            collector.on('collect', async i => {
+                if (i.customId === 'pause') {
+                    if (player.state.status === 'playing') {
+                        player.pause();
+                        row.components[0].setLabel('PLAY');
+                        row.components[0].setStyle('SUCCESS');
+                        await i.update({ components: [row] });
+                    } else {
+                        player.unpause();
+                        row.components[0].setLabel('PAUSE');
+                        row.components[0].setStyle('PRIMARY');
+                        await i.update({ components: [row] });
                     }
-                }).then(msg => {
-                    msg.react('⏸️');
-                    msg.react('▶️');
-                    msg.react('⏹️');
-                    msg.react('🔉');
-                    msg.react('🔊');
-                    msg.delete({ timeout: song.length * 1000 });
-                    const collector = msg.createReactionCollector(filter, { time: song.length * 1000 });
-                    collector.on('collect', r => {
-                        switch (r.emoji.name) {
-                            case '⏸️':
-                                dispatcher.pause(true);
-                                r.users.remove(r.users.cache.filter(u => !u.bot).first());
-                                break;
-                            case '▶️':
-                                dispatcher.resume();
-                                r.users.remove(r.users.cache.filter(u => !u.bot).first());
-                                break;
-                            case '⏹️':
-                                connection.disconnect();
-                                r.users.remove(r.users.cache.filter(u => !u.bot).first());
-                                msg.delete();
-                                break;
-                            case '🔉':
-                                currentVolume > 0.25 ? currentVolume -= 0.2 : currentVolume;
-                                dispatcher.setVolume(currentVolume);
-                                r.users.remove(r.users.cache.filter(u => !u.bot).first());
-                                break;
-                            case '🔊':
-                                currentVolume < 1.75 ? currentVolume += 0.2 : currentVolume;
-                                dispatcher.setVolume(currentVolume);
-                                r.users.remove(r.users.cache.filter(u => !u.bot).first());
-                                break;
-                            default: r.users.remove(r.users.cache.filter(u => !u.bot).first());
-                        }
+                }
+                else if (i.customId === 'voldown') {
+                    currentVolume = currentVolume - 0.1;
+                    resource.volume.setVolume(currentVolume);
+                    await i.update({ });
+                }
+                else if (i.customId === 'volup') {
+                    currentVolume = currentVolume + 0.1;
+                    resource.volume.setVolume(currentVolume);
+                    await i.update({ });
+                }
+                else if (i.customId === 'stop') {
+                    connection.disconnect();
+                    message.channel.bulkDelete(1, true).catch(err => {
+                        console.error(err);
                     });
-                });
+                    await i.update({ });
+                }
             });
-            dispatcher.on('finish', () => {
-                connection.disconnect();
-            });
-            dispatcher.on('error', console.error);
         } catch (error) {
             console.error(error);
             return message.channel
-                .send(({ embed: { description:`The URL ${args[0]} is invalid.`}}))
+                .send({
+                    embeds: [{
+                        description: `The URL ${args[0]} is invalid.`
+                    }]
+                })
                 .then(msg => {
-                    msg.delete({ timeout: msgExpireTime });
+                    setTimeout(() => msg.delete(), msgExpireTime)
                 })
                 .catch(console.error);
         }

@@ -40,25 +40,25 @@ module.exports = {
         if (user == null || userDb == undefined) {
             return message.channel
                 .send({
-                    embed: {
+                    embeds: [{
                         description: `**${user.username}**, either you or the receiver of the donation are not registered.\n` +
                             `To register, please insert the command \`.register\``
-                    }
+                    }]
                 })
                 .then(msg => {
-                    msg.delete({ timeout: msgExpireTime })
+                    setTimeout(() => msg.delete(), msgExpireTime)
                 })
                 .catch(console.error);
         }
         if (user.username != 'Redriel') {
             return message.channel
                 .send({
-                    embed: {
+                    embeds: [{
                         description: `I'm sorry **${user.username}**, only Redriel can hold the power of this command.`
-                    }
+                    }]
                 })
                 .then(msg => {
-                    msg.delete({ timeout: msgExpireTime })
+                    setTimeout(() => msg.delete(), msgExpireTime)
                 })
                 .catch(console.error);
         }
@@ -67,12 +67,12 @@ module.exports = {
 
         return message.channel
             .send({
-                embed: {
+                embeds: [{
                     description: `That's a secret 😉`
-                }
+                }]
             })
             .then(msg => {
-                msg.delete({ timeout: msgExpireTime })
+                setTimeout(() => msg.delete(), msgExpireTime)
             })
             .catch(console.error);
     },
