@@ -1,9 +1,13 @@
 const fs = require('fs');
+const { join } = require('path');
 const mp3Duration = require('mp3-duration');
 const humanizeDuration = require('humanize-duration');
 const { defaultJukeboxVolume } = require('./../config.json');
 const { users } = require('./../db_schema');
-const { msgExpireTime } = require('./../config.json');
+const { msgExpireTime, defaultPlayerVolume } = require('./../config.json');
+const { joinVoiceChannel, createAudioPlayer, createAudioResource, StreamType, generateDependencyReport } = require('@discordjs/voice');
+const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js');
+const { createReadStream } = require('fs');
 let currentVolume = defaultJukeboxVolume;
 
 module.exports = {
@@ -11,94 +15,93 @@ module.exports = {
     aliases: ['j', 'jbox'],
     description: 'Play the old classic Midnight, the Stars and You',
     async execute(message, args) {
-        const target = message.author;
         const mp3FileDuration = await mp3Duration('resources/midnight.mp3') * 1000;
-        const user = await users.findOne({ where: { user_id: target.id } });
-        if (!user) {
-            return message.channel
-                .send({
-                    embeds: [{
-                        description: `**${target.username}**, you are not registered.\n` +
-                            `Please insert the command \`.register\``
-                    }]
-                })
-                .then(msg => {
-                    setTimeout(() => msg.delete(), msgExpireTime)
-                })
-                .catch(console.error);
-        }
-        const items = await user.getItems();
-        const coin = await items.filter(i => i.item.name == `jukebox coin`)[0];
-        if (coin == null || coin == undefined || coin.amount < 1) {
-            return message.channel
-                .send({
-                    embeds: [{
-                        description: `Sorry ${target.username}, you don't have a \`jukebox coin\`!\n` +
-                            `You can buy one from the shop!\n` +
-                            `To see what's on sale, please digit \`.shop\`\n` +
-                            `You can buy an item by typing \`.buy [id/name]\``
-                    }]
-                })
-                .then(msg => {
-                    setTimeout(() => msg.delete(), msgExpireTime)
-                })
-                .catch(console.error);
-        }
         if (message.member.voice.channel) {
-            await user.removeItem(coin);
-            const connection = await message.member.voice.channel.join();
-            const dispatcher = connection.play(fs.createReadStream('resources/midnight.mp3'), { currentVolume: 0.4 });
-            const filter = (reaction, user) => ['⏸️', '▶️', '⏹️', '🔉', '🔊'].indexOf(reaction.emoji.name) > -1 && !user.bot;
-            dispatcher.on('start', () => {
-                message.channel
-                    .send({
-                        embeds: [{
-                            description: `Now playing an old time classic  📻\n` +
-                                `Duration: **${humanizeDuration(mp3FileDuration)}**\n`
-                        }]
-                    })
-                    .then(msg => {
-                        msg.react('⏸️');
-                        msg.react('▶️');
-                        msg.react('⏹️');
-                        msg.react('🔉');
-                        msg.react('🔊');
-                        setTimeout(() => msg.delete(), mp3FileDuration + 1000);
-                        const collector = msg.createReactionCollector(filter, { time: mp3FileDuration });
-                        collector.on('collect', r => {
-                            switch (r.emoji.name) {
-                                case '⏸️':
-                                    dispatcher.pause(true);
-                                    r.users.remove(r.users.cache.filter(u => !u.bot).first());
-                                    break;
-                                case '▶️':
-                                    dispatcher.resume();
-                                    r.users.remove(r.users.cache.filter(u => !u.bot).first());
-                                    break;
-                                case '⏹️':
-                                    connection.disconnect();
-                                    r.users.remove(r.users.cache.filter(u => !u.bot).first());
-                                    msg.delete();
-                                    break;
-                                case '🔉':
-                                    currentVolume > 0.25 ? currentVolume -= 0.2 : currentVolume;
-                                    dispatcher.setVolume(currentVolume);
-                                    r.users.remove(r.users.cache.filter(u => !u.bot).first());
-                                    break;
-                                case '🔊':
-                                    currentVolume < 1.75 ? currentVolume += 0.2 : currentVolume;
-                                    dispatcher.setVolume(currentVolume);
-                                    r.users.remove(r.users.cache.filter(u => !u.bot).first());
-                                    break;
-                                default: r.users.remove(r.users.cache.filter(u => !u.bot).first());
-                            }
-                        });
+            const connection = joinVoiceChannel({
+                channelId: message.member.voice.channelId,
+                guildId: message.member.voice.channel.guildId,
+                adapterCreator: message.member.voice.channel.guild.voiceAdapterCreator,
+            });
+            const player = createAudioPlayer();
+            const resource = createAudioResource(createReadStream(join(__dirname, '../resources/midnight.mp3')), {
+                inlineVolume: true
+            });
+            resource.volume.setVolume(0.4);
+            connection.subscribe(player);
+            player.play(resource);
+
+            const row = new MessageActionRow()
+                .addComponents(
+                    new MessageButton()
+                        .setCustomId('pause')
+                        .setLabel('PAUSE')
+                        .setStyle('PRIMARY'),
+                    new MessageButton()
+                        .setCustomId('voldown')
+                        .setLabel('VOL -')
+                        .setStyle('SECONDARY'),
+                    new MessageButton()
+                        .setCustomId('volup')
+                        .setLabel('VOL +')
+                        .setStyle('SECONDARY'),
+                    new MessageButton()
+                        .setCustomId('stop')
+                        .setLabel('STOP')
+                        .setStyle('DANGER')
+                );
+            const embed = new MessageEmbed()
+                .setDescription(
+                    `Now playing an old time classic  📻\n` +
+                    `Title: **Midnight, the Stars and You**\n` +
+                    `Duration: **${humanizeDuration(mp3FileDuration)}**\n`)
+                .setImage('attachment://../resources/lofi.gif')
+
+            message.channel
+                .send({
+                    embeds: [embed],
+                    components: [row],
+                    files: ['resources/lofi.gif']
+                })
+                .then(msg => {
+                    setTimeout(() => msg.delete(), mp3FileDuration)
+                })
+                .catch(console.error);
+
+            const filter = i => i.customId === 'pause' || i.customId === 'voldown' || i.customId === 'volup' || i.customId === 'stop';
+            const collector = message.channel.createMessageComponentCollector({ filter, time: mp3FileDuration });
+
+            collector.on('collect', async i => {
+                if (i.customId === 'pause') {
+                    if (player.state.status === 'playing') {
+                        player.pause();
+                        row.components[0].setLabel('PLAY');
+                        row.components[0].setStyle('SUCCESS');
+                        await i.update({ components: [row] });
+                    } else {
+                        player.unpause();
+                        row.components[0].setLabel('PAUSE');
+                        row.components[0].setStyle('PRIMARY');
+                        await i.update({ components: [row] });
+                    }
+                }
+                else if (i.customId === 'voldown') {
+                    currentVolume = currentVolume - 0.2;
+                    resource.volume.setVolume(currentVolume);
+                    await i.update({});
+                }
+                else if (i.customId === 'volup') {
+                    currentVolume = currentVolume + 0.2;
+                    resource.volume.setVolume(currentVolume);
+                    await i.update({});
+                }
+                else if (i.customId === 'stop') {
+                    connection.disconnect();
+                    message.channel.bulkDelete(1, true).catch(err => {
+                        console.error(err);
                     });
+                    await i.update({});
+                }
             });
-            dispatcher.on('finish', () => {
-                connection.disconnect();
-            });
-            dispatcher.on('error', console.error);
         } else {
             return message.channel
                 .send({

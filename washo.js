@@ -12,6 +12,7 @@
  */
 
 //TODO fix shop and leaderboard embeds
+//TODO: fix walkman and jukebox --done
 
 const fs = require('fs');
 const { createReadStream } = require('fs');
@@ -30,6 +31,7 @@ const { Client, Intents } = require('discord.js');
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES] });
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 const cooldowns = new Discord.Collection();
+const figlet = require('figlet');
 client.commands = new Discord.Collection();
 let connection, voiceChannel = null;
 
@@ -40,6 +42,13 @@ for (const file of commandFiles) {
 
 // Console log reports the successful log in.
 client.once('ready', async () => {
+	console.log(figlet.textSync('washo.js', {
+		font: 'Ogre',
+		horizontalLayout: 'default',
+		verticalLayout: 'default',
+		width: 80,
+		whitespaceBreak: true
+	}));
 	console.log(`${client.user.tag} is up and running.`);
 	const storedBalances = await users.findAll();
 	storedBalances.forEach(b => currency.set(b.user_id, b));

@@ -25,7 +25,8 @@ module.exports = {
                 thumbnail: songInfo.videoDetails.thumbnails[3]
             };
             const stream = ytdl(song.url, {
-                filter: 'audioonly'
+                filter: 'audioonly',
+                highWaterMark: 1 << 25,
             });
             const player = createAudioPlayer();
             const resource = createAudioResource(stream, {
@@ -87,17 +88,20 @@ module.exports = {
                     }
                 }
                 else if (i.customId === 'voldown') {
-                    currentVolume = currentVolume - 0.2;
+                    currentVolume = currentVolume - 0.1;
                     resource.volume.setVolume(currentVolume);
                     await i.update({ });
                 }
                 else if (i.customId === 'volup') {
-                    currentVolume = currentVolume + 0.2;
+                    currentVolume = currentVolume + 0.1;
                     resource.volume.setVolume(currentVolume);
                     await i.update({ });
                 }
                 else if (i.customId === 'stop') {
                     connection.disconnect();
+                    message.channel.bulkDelete(1, true).catch(err => {
+                        console.error(err);
+                    });
                     await i.update({ });
                 }
             });

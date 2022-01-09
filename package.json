@@ -6,6 +6,7 @@
     "discord.js": "^13.4.0",
     "ffmpeg": "0.0.4",
     "ffmpeg-static": "^4.4.0",
+    "figlet": "^1.5.2",
     "humanize-duration": "^3.27.1",
     "libsodium-wrappers": "^0.7.9",
     "mp3-duration": "^1.1.0",
