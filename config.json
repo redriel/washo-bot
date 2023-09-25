@@ -6,7 +6,7 @@
     "author": "Redriel",
     "prefix": ".",
     "token": "YOUR-TOKEN-HERE",
-    "msgExpireTime" : 30000,
+    "msgExpireTime" : 200,
     "defaultPlayerVolume": 1,
     "defaultJukeboxVolume": 0.35,
     "currencyUnit": "💠",

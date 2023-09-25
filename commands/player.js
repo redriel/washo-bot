@@ -66,7 +66,9 @@ module.exports = {
                     components: [row]
                 })
                 .then(msg => {
-                    setTimeout(() => msg.delete(), song.length * 1000)
+                    if(msg){
+                        setTimeout(() => msg.delete(), song.length * 1000);
+                    }
                 })
                 .catch(console.error);
 
@@ -114,7 +116,9 @@ module.exports = {
                     }]
                 })
                 .then(msg => {
-                    setTimeout(() => msg.delete(), msgExpireTime)
+                    if(msg){
+                        setTimeout(() => msg.delete(), msgExpireTime);
+                    }
                 })
                 .catch(console.error);
         }

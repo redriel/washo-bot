@@ -8,7 +8,7 @@
  * 
  * @date 2021/12/29
  * @author redriel
- * @version  0.1.0.1
+ * @version  0.2.0.6
  */
 
 //TODO fix shop and leaderboard embeds
@@ -20,13 +20,12 @@ const { join } = require('path');
 const Discord = require('discord.js');
 const { users, shop } = require('./db_schema');
 const { prefix, msgExpireTime } = require('./config.json');
-//const { token } = require('./token.json');
-const LOCAL_TOKEN = 'YOUR-TOKEN-HERE';
+const { token } = require('./token.json');
+const LOCAL_TOKEN = token;
 const HEROKU_TOKEN = process.env.BOT_TOKEN;
 const { joinVoiceChannel, createAudioPlayer, createAudioResource } = require('@discordjs/voice');
 const { Op } = require('sequelize');
 const currency = new Discord.Collection();
-// [v.0.0.2.5] Added intents to client for the new Discord update
 const { Client, Intents } = require('discord.js');
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES] });
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
@@ -133,7 +132,6 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
 	try {
 		if (newState.member.voice.channel && newState.id != client.user.id &&
 			newState.member.voice.member) {
-
 			const connection = joinVoiceChannel({
 				channelId: newState.member.voice.channelId,
 				guildId: newState.member.voice.channel.guildId,
@@ -148,13 +146,12 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
 			audioPlayer.play(resource);
 
 		} else if (oldState.member.voice.channel === null && oldState.id != client.user.id) {
-
 			const audioPlayer = createAudioPlayer();
 			const resource = createAudioResource(createReadStream(join(__dirname, 'resources/bye.ogg')), {
 				inlineVolume: true
 			});
 			resource.volume.setVolume(1.5);
-			connection.subscribe(audioPlayer);
+			//connection.subscribe(audioPlayer);
 			audioPlayer.play(resource);
 
 		}
@@ -164,6 +161,10 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
 process
 	.on('unhandledRejection', (reason, p) => {
 		console.error(reason, 'Unhandled Rejection at Promise', p);
+	})
+	.on('SIGINT', function() {
+		console.log(`Gracefully ending ${client.user.tag}. Bye!`);
+		process.exit(0);
 	})
 	.on('uncaughtException', err => {
 		console.error(err, 'Uncaught Exception thrown');
