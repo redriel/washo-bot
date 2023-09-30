@@ -114,9 +114,7 @@ client.on('messageCreate', async message => {
 
 	try {
 		command.execute(message, args);
-		message.channel.bulkDelete(1, true).catch(err => {
-			console.error(err);
-		});
+		message.delete();
 	} catch (error) {
 		console.error(error);
 		message.reply(`There was an error trying to execute the command \`${commandName}\`!`)

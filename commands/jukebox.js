@@ -96,9 +96,6 @@ module.exports = {
                 }
                 else if (i.customId === 'stop') {
                     connection.disconnect();
-                    message.channel.bulkDelete(1, true).catch(err => {
-                        console.error(err);
-                    });
                     await i.update({});
                 }
             });

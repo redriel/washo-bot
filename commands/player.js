@@ -1,7 +1,7 @@
-const ytdl = require('ytdl-core');
+const play = require ('play-dl'); 
 const humanizeDuration = require('humanize-duration');
 const { msgExpireTime, defaultPlayerVolume } = require('./../config.json');
-const { joinVoiceChannel, createAudioPlayer, createAudioResource, StreamType, generateDependencyReport } = require('@discordjs/voice');
+const { joinVoiceChannel, createAudioPlayer, createAudioResource, demuxProbe, NoSubscriberBehavior, StreamType, generateDependencyReport } = require('@discordjs/voice');
 const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js');
 const wait = require('util').promisify(setTimeout);
 let currentVolume = defaultPlayerVolume;
@@ -17,24 +17,35 @@ module.exports = {
                 guildId: message.member.voice.channel.guildId,
                 adapterCreator: message.member.voice.channel.guild.voiceAdapterCreator,
             });
-            const songInfo = await ytdl.getInfo(args[0]);
+            
+            const videoInfo = await play.video_info(args[0]);
+            const stream = await play.stream(args[0]);
             const song = {
-                title: songInfo.videoDetails.title,
-                url: songInfo.videoDetails.video_url,
-                length: songInfo.videoDetails.lengthSeconds,
-                thumbnail: songInfo.videoDetails.thumbnails[3]
+                title: videoInfo.video_details.title,
+                url: videoInfo.video_details.url,
+                length: videoInfo.video_details.durationInSec,
+                thumbnail: videoInfo.video_details.thumbnails[3]
             };
-            const stream = ytdl(song.url, {
-                filter: 'audioonly',
-                highWaterMark: 1 << 25,
-            });
-            const player = createAudioPlayer();
-            const resource = createAudioResource(stream, {
+
+            console.log(song);
+            
+            const resource = createAudioResource(stream.stream, {
+                inputType: stream.type,
                 inlineVolume: true
             });
+
+            const player = createAudioPlayer({
+                behaviors: {
+                    noSubscriber: NoSubscriberBehavior.Play
+                }
+            });
+
             resource.volume.setVolume(currentVolume);
-            connection.subscribe(player);
+
             player.play(resource);
+
+            connection.subscribe(player);
+            
             const row = new MessageActionRow()
                 .addComponents(
                     new MessageButton()
@@ -101,9 +112,6 @@ module.exports = {
                 }
                 else if (i.customId === 'stop') {
                     connection.disconnect();
-                    message.channel.bulkDelete(1, true).catch(err => {
-                        console.error(err);
-                    });
                     await i.update({ });
                 }
             });
