@@ -50,7 +50,7 @@ module.exports = {
                 })
                 .catch(console.error);
         }
-        if (user.username != 'Redriel') {
+        if (user.username != 'r3driel') {
             return message.channel
                 .send({
                     embeds: [{

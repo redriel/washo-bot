@@ -1,35 +1,47 @@
 const { defaultJukeboxVolume } = require('./../config.json');
-const ytdl = require('ytdl-core');
-const random = require('random');
-const fs = require('fs');
 const { join } = require('path');
-const { joinVoiceChannel, createAudioPlayer, createAudioResource, StreamType, generateDependencyReport } = require('@discordjs/voice');
+const { joinVoiceChannel, createAudioPlayer, createAudioResource } = require('@discordjs/voice');
 const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js');
-const humanizeDuration = require('humanize-duration');
-const mp3Duration = require('mp3-duration');
 const { createReadStream } = require('fs');
 
 let currentVolume = defaultJukeboxVolume;
+let local_track = false;
+let title = 'Some random music';
 
 module.exports = {
     name: 'walkman',
-    aliases: ['w', 'wk'],
+    aliases: ['w', 'wk', 'j', 'jbox', 'jukebox'],
     description: 'Play the virtual walkman with online tracks',
     async execute(message, args) {
         if (message.member.voice.channel) {
-            let track = '';
-            !args.length ? track = 'https://www.mboxdrive.com/chuck.mp3' : track = args[0];
-           
+            let track = args[0];
+            if (track == 'midnight') {
+                local_track = true;
+                track = '../resources/midnight.mp3';
+                title = 'Midnight, the Stars and You';
+            } else if (track == 'chuck') {
+                local_track = true;
+                track = '../resources/chuck.mp3';
+                title = 'Chuck gioca a CS';
+            }
+
             const connection = joinVoiceChannel({
                 channelId: message.member.voice.channelId,
                 guildId: message.member.voice.channel.guildId,
                 adapterCreator: message.member.voice.channel.guild.voiceAdapterCreator,
             });
             const player = createAudioPlayer();
-            const resource = 
-            createAudioResource(track, {
-                inlineVolume: true
-            });
+            let resource = null;
+            if (local_track == true) {
+                resource = createAudioResource(createReadStream(join(__dirname, track)), {
+                    inlineVolume: true
+                });
+            } else {
+                resource =
+                    createAudioResource(track, {
+                        inlineVolume: true
+                    });
+            }
             resource.volume.setVolume(1);
             connection.subscribe(player);
             player.play(resource);
@@ -55,19 +67,16 @@ module.exports = {
                 );
             const embed = new MessageEmbed()
                 .setDescription(
-                    `Now playing some random shit.\n` +
-                    `Title: **MP3 Title**\n` +
-                    `Duration: **not computed**\n`)
-                .setImage('attachment://../resources/lofi.gif')
+                    `Jukebox started.\n` +
+                    `Title: **${title}**\n` +
+                    `Requested by: **${(message.author.username)}**\n`)
+                //.setImage('attachment://../resources/lofi.gif')
 
             message.channel
                 .send({
                     embeds: [embed],
                     components: [row],
-                    files: ['resources/lofi.gif']
-                })
-                .then(msg => {
-                    setTimeout(() => msg.delete(), 10000)
+                    //files: ['resources/lofi.gif']
                 })
                 .catch(console.error);
 
@@ -109,9 +118,6 @@ module.exports = {
                     embeds: [{
                         description: `No one is listening, and I'm feeling lazy.`
                     }]
-                })
-                .then(msg => {
-                    setTimeout(() => msg.delete(), 10000)
                 })
                 .catch(console.error);
         }

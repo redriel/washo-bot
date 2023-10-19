@@ -26,8 +26,6 @@ module.exports = {
                 length: videoInfo.video_details.durationInSec,
                 thumbnail: videoInfo.video_details.thumbnails[3]
             };
-
-            console.log(song);
             
             const resource = createAudioResource(stream.stream, {
                 inputType: stream.type,
@@ -76,11 +74,6 @@ module.exports = {
                     embeds: [embed],
                     components: [row]
                 })
-                .then(msg => {
-                    if(msg){
-                        setTimeout(() => msg.delete(), song.length * 1000);
-                    }
-                })
                 .catch(console.error);
 
             const filter = i => i.customId === 'pause' || i.customId === 'voldown' || i.customId === 'volup' || i.customId === 'stop';
@@ -122,11 +115,6 @@ module.exports = {
                     embeds: [{
                         description: `The URL ${args[0]} is invalid.`
                     }]
-                })
-                .then(msg => {
-                    if(msg){
-                        setTimeout(() => msg.delete(), msgExpireTime);
-                    }
                 })
                 .catch(console.error);
         }
