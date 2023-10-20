@@ -1,4 +1,4 @@
-const { defaultJukeboxVolume } = require('./../config.json');
+const { defaultJukeboxVolume } = require('../config.json');
 const { join } = require('path');
 const { joinVoiceChannel, createAudioPlayer, createAudioResource } = require('@discordjs/voice');
 const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js');
@@ -9,17 +9,42 @@ let local_track = false;
 let title = 'Some random music';
 
 module.exports = {
-    name: 'walkman',
-    aliases: ['w', 'wk', 'j', 'jbox', 'jukebox'],
-    description: 'Play the virtual walkman with online tracks',
+    name: 'jukebox',
+    aliases: ['w', 'wk', 'j', 'jbox', 'walkman'],
+    description: 'Play the virtual jukebox with online tracks',
     async execute(message, args) {
+        if (args[0] == '-h' || args[0] == 'h' || args[0] == '-help' || args[0] == 'help') {
+            return message.channel
+                .send({
+                    embeds: [{
+                        title: `Usage of .jukebox command`,
+                        description: `After the command, pass as argument the track number or the mp3 link.\n` +
+                        `**Example**: .jukebox www.my-mp3-link.com/mymp3.mp3 or\n` +
+                        `**Example**: .jukebox 1\n` +
+                        `You can use the following aliases instead of .jukebox: .j .jbox .w .wk .walkman\n` +
+                        `You can also see the local track list using -t as an argument.\n`
+                    }]
+                })
+                .catch(console.error);
+        } else if (args[0] == '-t' || args[0] == 't' || args[0] == '-tracklist' || args[0] == 'tracklist') {
+            return message.channel
+                .send({
+                    embeds: [{
+                        title: `Local tracks`,
+                        description: 
+                        `1 -- **Midnight, the Stars and you**\n` +
+                        `2 -- **Chuck gioca a CS**\n`
+                    }]
+                })
+                .catch(console.error);
+        }
         if (message.member.voice.channel) {
             let track = args[0];
-            if (track == 'midnight') {
+            if (track == 'midnight' || track == '1') {
                 local_track = true;
                 track = '../resources/midnight.mp3';
                 title = 'Midnight, the Stars and You';
-            } else if (track == 'chuck') {
+            } else if (track == 'chuck' || track == '2') {
                 local_track = true;
                 track = '../resources/chuck.mp3';
                 title = 'Chuck gioca a CS';
@@ -70,13 +95,11 @@ module.exports = {
                     `Jukebox started.\n` +
                     `Title: **${title}**\n` +
                     `Requested by: **${(message.author.username)}**\n`)
-                //.setImage('attachment://../resources/lofi.gif')
 
             message.channel
                 .send({
                     embeds: [embed],
                     components: [row],
-                    //files: ['resources/lofi.gif']
                 })
                 .catch(console.error);
 

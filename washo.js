@@ -11,28 +11,20 @@
  * @version  0.2.0.6
  */
 
-//TODO fix shop and leaderboard embeds
-//TODO: fix walkman and jukebox --done
-
 const fs = require('fs');
 const { createReadStream } = require('fs');
 const { join } = require('path');
 const Discord = require('discord.js');
-const { users, shop } = require('./db_schema');
 const { prefix, msgExpireTime } = require('./config.json');
 const { token } = require('./token.json');
 const LOCAL_TOKEN = token;
-const HEROKU_TOKEN = process.env.BOT_TOKEN;
 const { joinVoiceChannel, createAudioPlayer, createAudioResource } = require('@discordjs/voice');
-const { Op } = require('sequelize');
-const currency = new Discord.Collection();
 const { Client, Intents } = require('discord.js');
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES] });
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 const cooldowns = new Discord.Collection();
 const figlet = require('figlet');
 client.commands = new Discord.Collection();
-let connection, voiceChannel = null;
 
 for (const file of commandFiles) {
 	const command = require(`./commands/${file}`);
@@ -49,8 +41,6 @@ client.once('ready', async () => {
 		whitespaceBreak: true
 	}));
 	console.log(`${client.user.tag} is up and running.`);
-	const storedBalances = await users.findAll();
-	storedBalances.forEach(b => currency.set(b.user_id, b));
 });
 
 // Every time a message is typed, this procedure starts.
@@ -143,15 +133,6 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
 			connection.subscribe(audioPlayer);
 			audioPlayer.play(resource);
 
-		} else if (oldState.member.voice.channel === null && oldState.id != client.user.id) {
-			const audioPlayer = createAudioPlayer();
-			const resource = createAudioResource(createReadStream(join(__dirname, 'resources/bye.ogg')), {
-				inlineVolume: true
-			});
-			resource.volume.setVolume(1.5);
-			//connection.subscribe(audioPlayer);
-			audioPlayer.play(resource);
-
 		}
 	} catch (e) { console.error(e) }
 });
@@ -160,7 +141,7 @@ process
 	.on('unhandledRejection', (reason, p) => {
 		console.error(reason, 'Unhandled Rejection at Promise', p);
 	})
-	.on('SIGINT', function() {
+	.on('SIGINT', function () {
 		console.log(`Gracefully ending ${client.user.tag}. Bye!`);
 		process.exit(0);
 	})
@@ -169,10 +150,5 @@ process
 		process.exit(1);
 	});
 
-if (typeof HEROKU_TOKEN === 'undefined') {
 	console.log('USING LOCAL TOKEN TO CONNECT');
 	client.login(LOCAL_TOKEN);
-} else {
-	console.log('USING HEROKU ENVIRONMENT TOKEN TO CONNECT');
-	client.login(HEROKU_TOKEN);
-}

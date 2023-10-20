@@ -1,23 +1,34 @@
-const play = require ('play-dl'); 
+const play = require('play-dl');
 const humanizeDuration = require('humanize-duration');
-const { msgExpireTime, defaultPlayerVolume } = require('./../config.json');
-const { joinVoiceChannel, createAudioPlayer, createAudioResource, demuxProbe, NoSubscriberBehavior, StreamType, generateDependencyReport } = require('@discordjs/voice');
+const defaultPlayerVolume = require('./../config.json');
+const { joinVoiceChannel, createAudioPlayer, createAudioResource, NoSubscriberBehavior } = require('@discordjs/voice');
 const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js');
-const wait = require('util').promisify(setTimeout);
 let currentVolume = defaultPlayerVolume;
 
 module.exports = {
-    name: 'youtube',
-    aliases: ['y', 'play', 'p', 'player'],
+    name: 'player',
+    aliases: ['y', 'play', 'p', 'youtube', 'yt'],
     description: 'Play music from youtube',
     async execute(message, args) {
+        if (args[0] == '-h' || args[0] == 'h' || args[0] == '-help' || args[0] == 'help') {
+            return message.channel
+                .send({
+                    embeds: [{
+                        title: `Usage of .player command`,
+                        description: `After the command, pass as argument the Youtube link of the video you want to stream.\n` +
+                        `**Example**: .p www.my-youtube-link.com\n` +
+                        `You can use the following aliases instead of .player: .p .y .play .youtube .yt\n`
+                    }]
+                })
+                .catch(console.error);
+        }
         try {
             const connection = joinVoiceChannel({
                 channelId: message.member.voice.channelId,
                 guildId: message.member.voice.channel.guildId,
                 adapterCreator: message.member.voice.channel.guild.voiceAdapterCreator,
             });
-            
+
             const videoInfo = await play.video_info(args[0]);
             const stream = await play.stream(args[0]);
             const song = {
@@ -26,7 +37,7 @@ module.exports = {
                 length: videoInfo.video_details.durationInSec,
                 thumbnail: videoInfo.video_details.thumbnails[3]
             };
-            
+
             const resource = createAudioResource(stream.stream, {
                 inputType: stream.type,
                 inlineVolume: true
@@ -39,11 +50,9 @@ module.exports = {
             });
 
             resource.volume.setVolume(currentVolume);
-
             player.play(resource);
-
             connection.subscribe(player);
-            
+
             const row = new MessageActionRow()
                 .addComponents(
                     new MessageButton()
@@ -66,8 +75,9 @@ module.exports = {
             const embed = new MessageEmbed()
                 .setDescription(`Now playing from YouTube\n` +
                     `Title: **${song.title}**\n` +
-                    `Duration: **${humanizeDuration(song.length * 1000)}**\n`)
-                .setImage(song.thumbnail.url)
+                    `Duration: **${humanizeDuration(song.length * 1000)}**\n`) +
+                    `Requested by: **${(message.author.username)}**\n`
+                    .setImage(song.thumbnail.url)
 
             message.channel
                 .send({
@@ -96,16 +106,16 @@ module.exports = {
                 else if (i.customId === 'voldown') {
                     currentVolume = currentVolume - 0.1;
                     resource.volume.setVolume(currentVolume);
-                    await i.update({ });
+                    await i.update({});
                 }
                 else if (i.customId === 'volup') {
                     currentVolume = currentVolume + 0.1;
                     resource.volume.setVolume(currentVolume);
-                    await i.update({ });
+                    await i.update({});
                 }
                 else if (i.customId === 'stop') {
                     connection.disconnect();
-                    await i.update({ });
+                    await i.update({});
                 }
             });
         } catch (error) {
