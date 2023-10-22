@@ -1,32 +1,73 @@
-const fs = require('fs');
+const { defaultJukeboxVolume } = require('../config.json');
 const { join } = require('path');
-const mp3Duration = require('mp3-duration');
-const humanizeDuration = require('humanize-duration');
-const { defaultJukeboxVolume } = require('./../config.json');
-const { users } = require('./../db_schema');
-const { msgExpireTime, defaultPlayerVolume } = require('./../config.json');
-const { joinVoiceChannel, createAudioPlayer, createAudioResource, StreamType, generateDependencyReport } = require('@discordjs/voice');
+const { joinVoiceChannel, createAudioPlayer, createAudioResource } = require('@discordjs/voice');
 const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js');
 const { createReadStream } = require('fs');
+
 let currentVolume = defaultJukeboxVolume;
+let local_track = false;
+let title = 'Some random music';
 
 module.exports = {
     name: 'jukebox',
-    aliases: ['j', 'jbox'],
-    description: 'Play the old classic Midnight, the Stars and You',
+    aliases: ['w', 'wk', 'j', 'jbox', 'walkman'],
+    description: 'Play the virtual jukebox with online tracks',
     async execute(message, args) {
-        const mp3FileDuration = await mp3Duration('resources/midnight.mp3') * 1000;
+        if (args[0] == '-h' || args[0] == 'h' || args[0] == '-help' || args[0] == 'help') {
+            return message.channel
+                .send({
+                    embeds: [{
+                        title: `Usage of .jukebox command`,
+                        description: `After the command, pass as argument the track number or the mp3 link.\n` +
+                        `**Example**: .jukebox www.my-mp3-link.com/mymp3.mp3 or\n` +
+                        `**Example**: .jukebox 1\n` +
+                        `You can use the following aliases instead of .jukebox: .j .jbox .w .wk .walkman\n` +
+                        `You can also see the local track list using -t as an argument.\n`
+                    }]
+                })
+                .catch(console.error);
+        } else if (args[0] == '-t' || args[0] == 't' || args[0] == '-tracklist' || args[0] == 'tracklist') {
+            return message.channel
+                .send({
+                    embeds: [{
+                        title: `Local tracks`,
+                        description: 
+                        `1 -- **Midnight, the Stars and you**\n` +
+                        `2 -- **Chuck gioca a CS**\n`
+                    }]
+                })
+                .catch(console.error);
+        }
         if (message.member.voice.channel) {
+            let track = args[0];
+            if (track == 'midnight' || track == '1') {
+                local_track = true;
+                track = '../resources/midnight.mp3';
+                title = 'Midnight, the Stars and You';
+            } else if (track == 'chuck' || track == '2') {
+                local_track = true;
+                track = '../resources/chuck.mp3';
+                title = 'Chuck gioca a CS';
+            }
+
             const connection = joinVoiceChannel({
                 channelId: message.member.voice.channelId,
                 guildId: message.member.voice.channel.guildId,
                 adapterCreator: message.member.voice.channel.guild.voiceAdapterCreator,
             });
             const player = createAudioPlayer();
-            const resource = createAudioResource(createReadStream(join(__dirname, '../resources/midnight.mp3')), {
-                inlineVolume: true
-            });
-            resource.volume.setVolume(0.4);
+            let resource = null;
+            if (local_track == true) {
+                resource = createAudioResource(createReadStream(join(__dirname, track)), {
+                    inlineVolume: true
+                });
+            } else {
+                resource =
+                    createAudioResource(track, {
+                        inlineVolume: true
+                    });
+            }
+            resource.volume.setVolume(1);
             connection.subscribe(player);
             player.play(resource);
 
@@ -51,24 +92,19 @@ module.exports = {
                 );
             const embed = new MessageEmbed()
                 .setDescription(
-                    `Now playing an old time classic  📻\n` +
-                    `Title: **Midnight, the Stars and You**\n` +
-                    `Duration: **${humanizeDuration(mp3FileDuration)}**\n`)
-                .setImage('attachment://../resources/lofi.gif')
+                    `Jukebox started.\n` +
+                    `Title: **${title}**\n` +
+                    `Requested by: **${(message.author.username)}**\n`)
 
             message.channel
                 .send({
                     embeds: [embed],
                     components: [row],
-                    files: ['resources/lofi.gif']
-                })
-                .then(msg => {
-                    setTimeout(() => msg.delete(), mp3FileDuration)
                 })
                 .catch(console.error);
 
             const filter = i => i.customId === 'pause' || i.customId === 'voldown' || i.customId === 'volup' || i.customId === 'stop';
-            const collector = message.channel.createMessageComponentCollector({ filter, time: mp3FileDuration });
+            const collector = message.channel.createMessageComponentCollector({ filter, time: 100000 });
 
             collector.on('collect', async i => {
                 if (i.customId === 'pause') {
@@ -96,9 +132,6 @@ module.exports = {
                 }
                 else if (i.customId === 'stop') {
                     connection.disconnect();
-                    message.channel.bulkDelete(1, true).catch(err => {
-                        console.error(err);
-                    });
                     await i.update({});
                 }
             });
@@ -108,9 +141,6 @@ module.exports = {
                     embeds: [{
                         description: `No one is listening, and I'm feeling lazy.`
                     }]
-                })
-                .then(msg => {
-                    setTimeout(() => msg.delete(), mp3FileDuration)
                 })
                 .catch(console.error);
         }

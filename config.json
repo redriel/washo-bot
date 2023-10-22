@@ -1,13 +1,13 @@
 {
     "name": "washo-bot",
-    "version": "0.2.0.3",
+    "version": "0.3.0.1",
     "description": "Washo is a friendly bot.",
     "main": "client.js",
     "author": "Redriel",
     "prefix": ".",
     "token": "YOUR-TOKEN-HERE",
-    "msgExpireTime" : 30000,
-    "defaultPlayerVolume": 1,
+    "msgExpireTime" : 300000,
+    "defaultPlayerVolume": 0.8,
     "defaultJukeboxVolume": 0.35,
     "currencyUnit": "💠",
     "startingCurrency": 50
