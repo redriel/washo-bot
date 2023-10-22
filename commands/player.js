@@ -1,6 +1,6 @@
 const play = require('play-dl');
 const humanizeDuration = require('humanize-duration');
-const defaultPlayerVolume = require('./../config.json');
+const { defaultPlayerVolume } = require('./../config.json');
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, NoSubscriberBehavior } = require('@discordjs/voice');
 const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js');
 let currentVolume = defaultPlayerVolume;
@@ -48,7 +48,7 @@ module.exports = {
                     noSubscriber: NoSubscriberBehavior.Play
                 }
             });
-
+            
             resource.volume.setVolume(currentVolume);
             player.play(resource);
             connection.subscribe(player);
@@ -75,9 +75,9 @@ module.exports = {
             const embed = new MessageEmbed()
                 .setDescription(`Now playing from YouTube\n` +
                     `Title: **${song.title}**\n` +
-                    `Duration: **${humanizeDuration(song.length * 1000)}**\n`) +
-                    `Requested by: **${(message.author.username)}**\n`
-                    .setImage(song.thumbnail.url)
+                    `Duration: **${humanizeDuration(song.length * 1000)}**\n` +
+                    `Requested by: **${(message.author.username)}**\n`)
+                .setImage(song.thumbnail.url)
 
             message.channel
                 .send({
@@ -104,18 +104,18 @@ module.exports = {
                     }
                 }
                 else if (i.customId === 'voldown') {
-                    currentVolume = currentVolume - 0.1;
+                    currentVolume = currentVolume - 0.2;
                     resource.volume.setVolume(currentVolume);
-                    await i.update({});
+                    await i.update({ });
                 }
                 else if (i.customId === 'volup') {
-                    currentVolume = currentVolume + 0.1;
+                    currentVolume = currentVolume + 0.2;
                     resource.volume.setVolume(currentVolume);
-                    await i.update({});
+                    await i.update({ });
                 }
                 else if (i.customId === 'stop') {
                     connection.disconnect();
-                    await i.update({});
+                    await i.update({ });
                 }
             });
         } catch (error) {
